@@ -1,12 +1,15 @@
 import { View, Text, Image, TextInput, TouchableOpacity, FlatList } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+
 // import {Status} from "expo-status-bar"
 import {StatusBar} from "expo-status-bar"
 import { themeColors } from "../theme";
 import {MapPinIcon} from "react-native-heroicons/solid"
 import {BellIcon, MagnifyingGlassIcon} from "react-native-heroicons/outline"
 import { useState } from "react";
-
+import Carousel  from "react-native-snap-carousel"
+import CoffeCard from "../components/CoffeCard";
+import { coffeeItems } from "../constants/fakeData";
 const categoreis = [
     {
         id: 1,
@@ -31,6 +34,7 @@ const categoreis = [
 ]
 
 const HomeScreen = () => {
+  
     const [activeCategory, setActiveCategory] = useState(1)
     return (
         <View className="flex-1 relative bg-white">
@@ -78,6 +82,20 @@ const HomeScreen = () => {
                         )
                      }}
                      />
+                </View>
+
+                {/* coffe card */}
+                <View className="mt-16 py-2">
+            
+                    <Carousel layout={'default'} 
+                      containerCustomStyle={{overflow:"visible"}}
+                      sliderWidth={400}
+                      itemWidth={260}
+                      loop={true}
+                      data={coffeeItems}
+                      renderItem={({item}) => <CoffeCard item={item}/>}
+                      
+                    />
                 </View>
             </SafeAreaView>
         </View>
