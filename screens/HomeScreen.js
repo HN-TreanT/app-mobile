@@ -10,6 +10,7 @@ import { useState } from "react";
 import Carousel  from "react-native-snap-carousel"
 import CoffeCard from "../components/CoffeCard";
 import { coffeeItems } from "../constants/fakeData";
+
 const categoreis = [
     {
         id: 1,
@@ -37,7 +38,7 @@ const HomeScreen = () => {
   
     const [activeCategory, setActiveCategory] = useState(1)
     return (
-        <View className="flex-1 relative bg-white">
+        <View className="flex-1 relative bg-white box-border">
             
              <Image source={require("../assets/beansBackground1.png")}
              className="w-full absolute -top-5 opacity-10" style = {{height: 220}}/>
@@ -85,9 +86,9 @@ const HomeScreen = () => {
                 </View>
 
                 {/* coffe card */}
-                <View className="mt-16 py-2">
-            
-                    <Carousel layout={'default'} 
+                <View className="mt-10 py-2">      
+                    <Carousel 
+                      layout={'default'} 
                       containerCustomStyle={{overflow:"visible"}}
                       sliderWidth={400}
                       itemWidth={260}
