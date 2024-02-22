@@ -10,45 +10,10 @@ import {
   } from "react-native";
   import { SafeAreaView } from "react-native-safe-area-context";
   import { useState, useEffect } from "react";
-  import { BellIcon, ArrowLeftIcon, MagnifyingGlassIcon, ChevronRightIcon, ChevronLeftIcon } from "react-native-heroicons/outline";
+  import { MapPinIcon, ArrowLeftIcon, EllipsisVerticalIcon, ChevronRightIcon } from "react-native-heroicons/outline";
   import {useNavigation} from "@react-navigation/native"
   import CardProduct from "../components/CardProduct";
 
-
-  const categoreis = [
-    {
-        id: 1,
-        title: "Cappuccino",
-      },
-      {
-        id: 2,
-        title: "Latte",
-      },
-      {
-        id: 3,
-        title: "Espresso",
-      },
-      {
-        id: 4,
-        title: "Mocha",
-      },
-      {
-        id: 5,
-        title: "Americano",
-      },
-      {
-        id: 6,
-        title: "Cafe sữa đã",
-      },
-      {
-        id: 7,
-        title: "Cafe đá xay",
-      },
-      {
-        id: 8,
-        title: "Cafe chồn",
-      },
-]
 
 const data = [];
 for (let i = 0; i < 10; i++) {
@@ -58,7 +23,7 @@ for (let i = 0; i < 10; i++) {
 }
 
 
-const ProductScreen = (props) => {
+const DetailOrderScreen = (props) => {
     const navigation = useNavigation()
     const id_table = props.route.params
     const [activeCategory, setActiveCategory] = useState(1)
@@ -115,39 +80,27 @@ const ProductScreen = (props) => {
                 source={require("../assets/logo4.png")}
                 className="h-9 w-40 rounded-full"
               /> */}
-              <Text className="font-semibold" style={{fontSize:20}}>Sản phẩm</Text>
+              <Text className="font-semibold" style={{fontSize:20}}>Chi tiết đơn</Text>
             </View>
-            <BellIcon size="27" color="rgb(179, 179, 179)" />
+            <EllipsisVerticalIcon size="27" color="rgb(179, 179, 179)" />
           </View>
-           {/* search bar */}
-           <View className="mx-5 mt-6">
-                        <View className="flex-row justify-center items-center rounded-full p-1 bg-[#e6e6e6]">
-                            <TextInput placeholder="Tìm kiếm" className="p-2 flex-1 font-semibold text-gray-700"/>
-                            <TouchableOpacity className="rounded-full p-2" style={{backgroundColor:"rgb(179, 179, 179)"}}>
-                                <MagnifyingGlassIcon size="25" strokeWidth={2} color="white"/>
-                            </TouchableOpacity>
-                        </View>
-            </View>
-           <View className="px-5 mt-6">
-                <FlatList
-                        horizontal
-                        showsHorizontalScrollIndicator={false}
-                        data={categoreis}
-                        
-                        keyExtractor={item => item.id}
-                        className="overflow-visible"
-                        renderItem={({item}) => {
-                            const isActive =item.id == activeCategory
-                            return (
-                                <TouchableOpacity onPress={() => setActiveCategory(item.id)} style={{backgroundColor: isActive ? "#0080ff" : 'white', borderRadius:10}}  className="p-2 x-5  mr-2 shadow">
-                                    <Text style={{color: isActive ? "white" : "black"}} className={isActive ? "font-semibold": "font-normal"}>{item.title}</Text>
-                                   
 
-                                </TouchableOpacity>
-                            )
-                        }}
-                />
-          </View>
+          <View style={{height: 40, 
+               borderBottomColor: "rgb(199, 199, 199)",
+              borderBottomWidth: 1,}} className="mr-2 ml-2 flex-row">
+                <View className="w-1/2 flex-row items-center"
+                   style={{
+                    borderRightColor: "rgb(199, 199, 199)",
+                    borderRightWidth: 1,
+                    
+                   }}
+                >
+                     <MapPinIcon size="23" color="#0080ff" style={{marginLeft:8}} />
+                     <Text className=" ml-2" style={{color:"#0080ff"}}>Ăn tại bàn</Text>
+                </View>
+                <View className="w-1/2 flex-row items-center"><Text className="ml-4">Bàn số 12</Text></View>
+
+           </View>
 
            {/* list order */}
           <View
@@ -186,4 +139,4 @@ const ProductScreen = (props) => {
     )
 }
 
-export default ProductScreen
+export default DetailOrderScreen
