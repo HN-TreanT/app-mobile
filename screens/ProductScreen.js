@@ -14,7 +14,6 @@ import {
   import {useNavigation} from "@react-navigation/native"
   import CardProduct from "../components/CardProduct";
 
-
   const categoreis = [
     {
         id: 1,

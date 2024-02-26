@@ -11,10 +11,11 @@ import {
   import { SafeAreaView } from "react-native-safe-area-context";
   import { useState, useEffect } from "react";
   import { MapPinIcon, ArrowLeftIcon, EllipsisVerticalIcon, ChevronRightIcon } from "react-native-heroicons/outline";
+  import {PlusCircleIcon} from "react-native-heroicons/solid"
   import {useNavigation} from "@react-navigation/native"
-  import CardProduct from "../components/CardProduct";
-
-
+  import CardOrderDetail from "../components/CardOrderDetail";
+  import {BottomSheet, Button, ListItem } from "@rneui/themed"
+  import {SafeAreaProvider} from "react-native-safe-area-context"
 const data = [];
 for (let i = 0; i < 10; i++) {
   data.push({
@@ -31,6 +32,17 @@ const DetailOrderScreen = (props) => {
     const [data, setData] = useState([]);
   const [isLoading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
+
+  const list = [
+    { title: 'List Item 1' },
+    { title: 'List Item 2' },
+    {
+      title: 'Cancel',
+      containerStyle: { backgroundColor: 'red' },
+      titleStyle: { color: 'white' },
+      onPress: () => setIsVisible(false),
+    },
+  ];
 
   useEffect(() => {
     fetchData();
@@ -104,13 +116,13 @@ const DetailOrderScreen = (props) => {
 
            {/* list order */}
           <View
-             style={{height:580}}
+             style={{height:600}}
             className=" w-full flex-row mt-4  justify-center "
           >    
                 <View className="h-full w-11/12 ">
                     <FlatList
                         data={data}
-                        renderItem={(item) => <CardProduct item={item}/>}
+                        renderItem={(item) => <CardOrderDetail item={item}/>}
                         keyExtractor={item => item.id.toString()}
                         onEndReached={fetchData}
                         onEndReachedThreshold={0.5}
@@ -119,21 +131,56 @@ const DetailOrderScreen = (props) => {
                 </View>
           </View>
 
-          <View style={{
-            
+          <View style={{          
               backgroundColor:"white",
-              
-              
-          }} className="h-14 flex-row items-center justify-between" >
-              <Text style={{marginLeft:14}}  className="font-semibold ">Bàn số {id_table}</Text>
-              <Text className="font-semibold">Số lượng món ăn: 20</Text>
-              <TouchableOpacity onPress={() => navigation.navigate("DetailOrder")} style={{backgroundColor:  "#0080ff" , borderRadius:10, marginRight:15}}  className="p-2 flex-row items-center">
-                    <Text style={{color: "white"}} className="font-semibold">Tiếp theo</Text>
-                    <ChevronRightIcon size="20" color="white" />
-               </TouchableOpacity>
+                          
+          }} className="h-32 flex-col justify-end" >
+              <View style={{backgroundColor:"#eff8fe", borderColor:" #f3f5f7", borderWidth:0.5}} className="m-3 flex-row justify-end items-center">
+                   <Text  style={{fontSize:15, paddingTop:4, paddingBottom:4,}} className="font-bold">Tổng: 100.000đ</Text>
+              </View>
+          
+              <View className="flex-row h-14 justify-around">
+                 <TouchableOpacity  style={{backgroundColor:  "#24A019" , borderRadius:10, marginRight:15}}  className="w-24 m-2  flex-row items-center justify-center">
+                      <PlusCircleIcon size="20" color="white" />
+                      <Text style={{color: "white"}} className="font-semibold p-2">Thêm</Text>
+                      
+                 </TouchableOpacity>
+          
+                <TouchableOpacity  style={{ borderColor:"rgb(179, 179, 179)",borderWidth:1, borderRadius:10, marginRight:15}}  className="w-1/3 m-2 flex-row items-center justify-center">
+                      <Text style={{color: "rgb(179, 179, 179)"}} className="font-semibold p-2">Lưu</Text>
+                  
+                </TouchableOpacity>
+
+               
+                <TouchableOpacity  style={{backgroundColor:  "#0080ff" , borderRadius:10, marginRight:15}}  className="w-1/3 m-2 flex-row items-center justify-center">
+                      <Text style={{color: "white"}} className="font-semibold p-2">Thanh toán</Text>
+                   
+                </TouchableOpacity>
+
+
+              </View>
           </View>
         
         </SafeAreaView>
+        <SafeAreaProvider>
+      
+            <BottomSheet  modalProps={{
+            
+            }} isVisible={true}>
+                 {list.map((l, i) => (
+                    <ListItem
+                      key={i}
+                      containerStyle={l.containerStyle}
+                      onPress={l.onPress}
+                    >
+                      <ListItem.Content>
+                        <ListItem.Title style={l.titleStyle}>{l.title}</ListItem.Title>
+                      </ListItem.Content>
+                    </ListItem>
+                  ))}
+            </BottomSheet>
+        
+        </SafeAreaProvider>
         
       </View>
     )
