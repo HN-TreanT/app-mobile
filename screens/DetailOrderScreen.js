@@ -6,11 +6,20 @@ import {
     TouchableOpacity,
     FlatList,
    ActivityIndicator,
+   TouchableWithoutFeedback,
+   StyleSheet
    
   } from "react-native";
   import { SafeAreaView } from "react-native-safe-area-context";
   import { useState, useEffect } from "react";
-  import { MapPinIcon, ArrowLeftIcon, EllipsisVerticalIcon, ChevronRightIcon } from "react-native-heroicons/outline";
+  import { MapPinIcon, ArrowLeftIcon, 
+    EllipsisVerticalIcon, 
+    XMarkIcon,
+    ClipboardDocumentCheckIcon, // gop don
+    DocumentDuplicateIcon,// tach don
+    DocumentMinusIcon,//huy don
+    ArrowLeftEndOnRectangleIcon, //Chuyen ban
+   } from "react-native-heroicons/outline";
   import {PlusCircleIcon} from "react-native-heroicons/solid"
   import {useNavigation} from "@react-navigation/native"
   import CardOrderDetail from "../components/CardOrderDetail";
@@ -28,19 +37,36 @@ const DetailOrderScreen = (props) => {
     const navigation = useNavigation()
     const id_table = props.route.params
     const [activeCategory, setActiveCategory] = useState(1)
+    const [visible, setIsVisible] = useState(false)
 
     const [data, setData] = useState([]);
   const [isLoading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
 
+  // ClipboardDocumentCheckIcon, // gop don
+  // DocumentDuplicateIcon,// tach don
+  // DocumentMinusIcon,//huy don
+  // ArrowLeftEndOnRectangleIcon, //Chuyen ban
   const list = [
-    { title: 'List Item 1' },
-    { title: 'List Item 2' },
-    {
-      title: 'Cancel',
-      containerStyle: { backgroundColor: 'red' },
-      titleStyle: { color: 'white' },
-      onPress: () => setIsVisible(false),
+    { 
+      title: 'Gộp đơn', 
+      icon: <ClipboardDocumentCheckIcon size={25} color={"#0080ff"} style={{marginRight:4}}/>, 
+      onPress: () => console.log("gop don") 
+    },
+    { 
+      title: 'Tách đơn', 
+      icon: <DocumentDuplicateIcon size={25} color={"#0080ff"} style={{marginRight:4}}/>, 
+      onPress: () => console.log("tach don") 
+    },
+    { 
+      title: 'Hủy đơn', 
+      icon: <DocumentMinusIcon size={25} color={"#0080ff"} style={{marginRight:4}}/>, 
+      onPress: () => console.log("huy don") 
+    },
+    { 
+      title: 'Chuyển bàn', 
+      icon: <ClipboardDocumentCheckIcon size={25} color={"#0080ff"} style={{marginRight:4}}/>, 
+      onPress: () => console.log(" chuyen ban") 
     },
   ];
 
@@ -74,14 +100,15 @@ const DetailOrderScreen = (props) => {
   };
 
     return (
-        <View style={{backgroundColor:"#F1F1F1"}} className="flex-1  relative box-border">
+      <View style={{backgroundColor:"#F1F1F1"}} className="flex-1  relative box-border">
+           
         <SafeAreaView className="flex-1">
           <View
             style={{
               borderBottomColor: "rgb(199, 199, 199)",
               borderBottomWidth: 1,
             }}
-            className="px-4 pb-4 mr-2 ml-2 pt-2 flex-row justify-between items-center"
+            className="px-4 pb-4 pt-2 flex-row justify-between items-center"
           >
             <TouchableOpacity className=" rounded-full" onPress={() => navigation.goBack()}>
               <ArrowLeftIcon size="27" color="rgb(179, 179, 179)" />
@@ -94,7 +121,9 @@ const DetailOrderScreen = (props) => {
               /> */}
               <Text className="font-semibold" style={{fontSize:20}}>Chi tiết đơn</Text>
             </View>
-            <EllipsisVerticalIcon size="27" color="rgb(179, 179, 179)" />
+            <TouchableOpacity onPress={() => setIsVisible(true)}>
+                <EllipsisVerticalIcon size="27" color="rgb(179, 179, 179)" />
+            </TouchableOpacity>
           </View>
 
           <View style={{height: 40, 
@@ -135,7 +164,7 @@ const DetailOrderScreen = (props) => {
               backgroundColor:"white",
                           
           }} className="h-32 flex-col justify-end" >
-              <View style={{backgroundColor:"#eff8fe", borderColor:" #f3f5f7", borderWidth:0.5}} className="m-3 flex-row justify-end items-center">
+              <View style={{backgroundColor:"#eff8fe", borderWidth:1, borderColor:"#e6e6e6"}} className="m-3 flex-row justify-end items-center">
                    <Text  style={{fontSize:15, paddingTop:4, paddingBottom:4,}} className="font-bold">Tổng: 100.000đ</Text>
               </View>
           
@@ -164,26 +193,45 @@ const DetailOrderScreen = (props) => {
         </SafeAreaView>
         <SafeAreaProvider>
       
-            <BottomSheet  modalProps={{
+            <BottomSheet backdropStyle={styles.containerStyle} onBackdropPress={() => setIsVisible(false)}    modalProps={{
+               containerStyle: styles.containerStyle
             
-            }} isVisible={true}>
-                 {list.map((l, i) => (
-                    <ListItem
-                      key={i}
-                      containerStyle={l.containerStyle}
-                      onPress={l.onPress}
-                    >
-                      <ListItem.Content>
-                        <ListItem.Title style={l.titleStyle}>{l.title}</ListItem.Title>
-                      </ListItem.Content>
-                    </ListItem>
-                  ))}
+            }} isVisible={visible}>
+             
+                 <View style={{flex: 1, borderTopRightRadius: 10, borderTopLeftRadius: 10}}>
+                  {list.map((l, i) => (
+                      <ListItem
+                        key={i}
+                        onPress={l.onPress} 
+                      >
+                        <ListItem.Content className="flex-row justify-start items-center">
+                            {l.icon}
+                            <ListItem.Title >{l.title}</ListItem.Title>
+                        </ListItem.Content>
+                      </ListItem>
+                    ))}
+                      <ListItem style={{borderTopColor: "#e6e6e6", borderTopWidth: 1}}>
+                          <ListItem.Content className="flex-row justify-start items-center" >
+                            <XMarkIcon size={25} color={"#0080ff"} style={{marginRight:4}}/>
+                            <ListItem.Title >Đóng</ListItem.Title>
+                          </ListItem.Content>
+                      </ListItem>
+                 </View>
+
+             
+                
             </BottomSheet>
         
         </SafeAreaProvider>
-        
+       
       </View>
     )
 }
+
+const styles = StyleSheet.create({
+  containerStyle: {
+     
+  }
+})
 
 export default DetailOrderScreen

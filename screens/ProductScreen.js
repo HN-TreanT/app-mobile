@@ -10,10 +10,10 @@ import {
   } from "react-native";
   import { SafeAreaView } from "react-native-safe-area-context";
   import { useState, useEffect } from "react";
-  import { BellIcon, ArrowLeftIcon, MagnifyingGlassIcon, ChevronRightIcon, ChevronLeftIcon } from "react-native-heroicons/outline";
+  import { BellIcon, ArrowLeftIcon, MagnifyingGlassIcon, ChevronRightIcon, ChevronLeftIcon, ChevronUpIcon } from "react-native-heroicons/outline";
   import {useNavigation} from "@react-navigation/native"
   import CardProduct from "../components/CardProduct";
-
+import BottomSheetProduct from "../components/BottomSheetProduct";
   const categoreis = [
     {
         id: 1,
@@ -61,6 +61,7 @@ const ProductScreen = (props) => {
     const navigation = useNavigation()
     const id_table = props.route.params
     const [activeCategory, setActiveCategory] = useState(1)
+    const [visible, setVisible] = useState(false)
 
     const [data, setData] = useState([]);
   const [isLoading, setLoading] = useState(false);
@@ -150,7 +151,7 @@ const ProductScreen = (props) => {
 
            {/* list order */}
           <View
-             style={{height:580}}
+             style={{height:560}}
             className=" w-full flex-row mt-4  justify-center "
           >    
                 <View className="h-full w-11/12 ">
@@ -165,21 +166,33 @@ const ProductScreen = (props) => {
                 </View>
           </View>
 
-          <View style={{
-            
+         <View
+             style={{
+                
               backgroundColor:"white",
+              zIndex:99,
+                    
+          }}
+          className="h-20 flex-col items-center">
+             <TouchableOpacity onPress={() => setVisible(true)} >
+                <ChevronUpIcon size="25" color="black" />
+             </TouchableOpacity>
+              <View style={{borderTopColor:"#e6e6e6", borderTopWidth: 1}}  className=" mr-2 ml-2 h-14 w-full flex-row items-center justify-between" >
               
-              
-          }} className="h-14 flex-row items-center justify-between" >
-              <Text style={{marginLeft:14}}  className="font-semibold ">Bàn số {id_table}</Text>
-              <Text className="font-semibold">Số lượng món ăn: 20</Text>
-              <TouchableOpacity onPress={() => navigation.navigate("DetailOrder")} style={{backgroundColor:  "#0080ff" , borderRadius:10, marginRight:15}}  className="p-2 flex-row items-center">
-                    <Text style={{color: "white"}} className="font-semibold">Tiếp theo</Text>
-                    <ChevronRightIcon size="20" color="white" />
-               </TouchableOpacity>
-          </View>
-        
+                  <View style={{marginLeft:7}}>
+                    <Text style={{fontSize: 15}}  className="font-medium ">Thành tiền: 40.000đ</Text>
+                    <Text style={{color:"rgb(179, 179, 179)"}}  className="font-semibold ">Đặt hàng: 4</Text>
+                  </View>
+                  <TouchableOpacity onPress={() => navigation.navigate("DetailOrder")} style={{backgroundColor:  "#0080ff" , borderRadius:10, marginRight:15}}  className="p-2 flex-row items-center">
+                        <Text style={{color: "white"}} className="font-semibold">Tiếp theo</Text>
+                        <ChevronRightIcon size="20" color="white" />
+                  </TouchableOpacity>
+              </View>
+              <BottomSheetProduct visible={visible} setIsVisible={setVisible}/>
+         </View>
+       
         </SafeAreaView>
+       
         
       </View>
     )
