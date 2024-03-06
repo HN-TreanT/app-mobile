@@ -4,9 +4,11 @@ import { View, Text, TouchableOpacity } from "react-native";
 import {BellAlertIcon, EllipsisVerticalIcon, EllipsisHorizontalIcon, ClockIcon, CurrencyDollarIcon} from "react-native-heroicons/solid"
 import Tag from "./Tag";
 import TagStatus from "../constants/TagStatus";
+import {useNavigation} from "@react-navigation/native"
 
 
 const CardOrder = ({item}) => {
+  const navigation = useNavigation()
   const [hiddenDropdown, setHiddenDropdown] = useState(true)
     return(
         <View style={{
@@ -24,29 +26,9 @@ const CardOrder = ({item}) => {
                 </View>
                 <View><Text className="font-semibold">MTA Coffee</Text></View>
                 <View style={{position:"relative"}} className="mr-2">
-                    <EllipsisHorizontalIcon size={22} color={"#0080ff"}/>  
-                     {/* <View style={{position:"absolute", right:0, top:15, backgroundColor:"white"}} className="h-16 w-24">
-                         <FlatList
-                            data={[
-                              {
-                                id: 1,
-                                title: "Thanh toán",
-                              },
-                              {
-                                id: 2,
-                                title: "Hoàn thành",
-                              },
-                            ]}
-                            keyExtractor={item => item.id}
-                            renderItem={({item}) => 
-                            // <TouchableOpacity >
-                                <Text className={"font-normal pt-2 pb-1 pr-2 pl-2"} style={{}}>{item.title}</Text>
-                            // </TouchableOpacity>
-                          }
-          
-                        />
-
-                     </View>          */}
+                    <TouchableOpacity onPress={() => navigation.navigate("DetailOrder")}>
+                        <EllipsisHorizontalIcon size={24} color={"#0080ff"}/> 
+                    </TouchableOpacity>    
                 </View>
            </View>
 

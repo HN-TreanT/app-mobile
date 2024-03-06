@@ -9,12 +9,18 @@ import {
  ActivityIndicator
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-
+import useActions from "../redux/useActions";
+import {useDispatch, useSelector} from "react-redux"
+import authServices from "../utils/services/authServices";
 import { Bars3Icon } from "react-native-heroicons/solid";
 import { BellIcon } from "react-native-heroicons/outline";
 import { CreditCardIcon as CreditCardSolid } from "react-native-heroicons/solid";
 import { useState, useEffect } from "react";
 import CardOrder from "../components/CardOrder";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useNavigation} from "@react-navigation/native"
+
+
 
 const data = [];
 for (let i = 0; i < 10; i++) {
@@ -24,6 +30,14 @@ for (let i = 0; i < 10; i++) {
 }
 
 const OrderScreen = () => {
+ 
+  const navigation = useNavigation()
+  // test
+  const user_info = useSelector((state) => state.auth.user_info)
+  const dispatch = useDispatch()
+  const actions = useActions()
+
+  ///
   const [isEnabled, setIsEnabled] = useState(false);
   const toggleSwitch = () => setIsEnabled((previousState) => !previousState);
 
@@ -69,7 +83,9 @@ const OrderScreen = () => {
           }}
           className="px-4 pb-4 mr-2 ml-2 pt-2 flex-row justify-between items-center"
         >
-          <Bars3Icon size="27" color="black" />
+          <Bars3Icon onPress={() => {
+              navigation.navigate("Login")
+          }} size="27" color="black" />
 
           <View className="flex-row items-center space-x-2">
             <Image
@@ -77,7 +93,15 @@ const OrderScreen = () => {
               className="h-9 w-40 rounded-full"
             />
           </View>
-          <BellIcon size="27" color="rgb(179, 179, 179)" />
+          <TouchableOpacity onPress={async () => {
+                        dispatch(actions.AuthActions.userInfo({name:"Hoang Nam", age: 20}))
+                        await AsyncStorage.setItem("access_token", "ojfef")
+                        // authServices.login({username: "admin", password: "1"}).then((res) => {
+                        //   console.log(res)
+                        // })
+                      }}>
+              <BellIcon onPress={() =>  console.log("check access_token", AsyncStorage.getItem("access_token"))} size="27" color="rgb(179, 179, 179)" />
+          </TouchableOpacity>
         </View>
         <View className="h-10 flex-row items-center mr-2 ml-2 justify-between">
           <Text className="font-semibold opacity-70">Tổng số đơn: 764</Text>

@@ -1,6 +1,7 @@
 import { View, Text, Image, TextInput, TouchableOpacity, FlatList } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-
+import {useDispatch, useSelector} from "react-redux"
+import useActions from "../redux/useActions";
 // import {Status} from "expo-status-bar"
 import {StatusBar} from "expo-status-bar"
 import { themeColors } from "../theme";
@@ -35,6 +36,10 @@ const categoreis = [
 ]
 
 const HomeScreen = () => {
+  const user_info = useSelector((state) => state.auth.user_info)
+  console.log("check user_info", user_info)
+  const dispatch = useDispatch()
+  const actions = useActions()
   
     const [activeCategory, setActiveCategory] = useState(1)
     return (
@@ -52,7 +57,12 @@ const HomeScreen = () => {
                         <Text className="text-base font-semibold">Hoàng Quốc Việt, Hà Nội</Text>
                        
                     </View>
-                    <BellIcon size="27" color="black"/>
+                    <TouchableOpacity onPress={() => {
+                        console.log("click")
+                        dispatch(actions.AuthActions.userInfo({name:"Hoang Nam", age: 20}))
+                      }}>
+                      <BellIcon  size="27" color="black"/>
+                    </TouchableOpacity>
 
               
                 
