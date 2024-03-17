@@ -14,7 +14,7 @@ import {useDispatch, useSelector} from "react-redux"
 import authServices from "../utils/services/authServices";
 import { Bars3Icon } from "react-native-heroicons/solid";
 import { BellIcon } from "react-native-heroicons/outline";
-import { CreditCardIcon as CreditCardSolid } from "react-native-heroicons/solid";
+import { CreditCardIcon as CreditCardSolid, PlusIcon } from "react-native-heroicons/solid";
 import { useState, useEffect } from "react";
 import CardOrder from "../components/CardOrder";
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -149,8 +149,28 @@ const OrderScreen = () => {
                     />
                 </View>
           </View>
+        
         </View>
       </SafeAreaView>
+      <TouchableOpacity onPress={(value) => {
+        navigation.navigate("table")
+        
+      }}>
+        <View style={{
+              position: "fixed",
+              backgroundColor:"#0080ff",
+              top: 50,
+              botiom: 20,
+              right: 200,
+              left: 360,
+              width: 30,
+              height: 30
+            }}>
+                <PlusIcon size="30" className="font-bold" style={{
+                  color:"white"
+                }}/>
+            </View>
+      </TouchableOpacity>
     </View>
   );
 };

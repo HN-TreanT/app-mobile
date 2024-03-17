@@ -37,7 +37,6 @@ const categoreis = [
 
 const HomeScreen = () => {
   const user_info = useSelector((state) => state.auth.user_info)
-  console.log("check user_info", user_info)
   const dispatch = useDispatch()
   const actions = useActions()
   
