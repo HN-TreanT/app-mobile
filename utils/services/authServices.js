@@ -1,26 +1,35 @@
 import API from "../API";
 
+import createApiService from "../createApiServices"
+const api = createApiService()
 
-const login = async (data) => {
-    const uri = "/api/v1/auth/login"
-    const res = await API.post(uri, data)
-    return res
+const login = (data) => {
+    return api.makeRequest({
+        url: `/api/v1/auth/login`,
+        method: "POST",
+        data: data
+    })
 }
 
 
-const register = async (data) => {
-    const uri = "/api/v1/auth/register"
-    const res = await API.post(uri, data)
-    return res
-}
+const register = (data) => {
+    return api.makeRequest({
+      url: `/api/v1/auth/register`,
+      method: "POST",
+      data: data
+    });
+  };
 
-const changePassword = async (data) => {
-    const uri = "/api/v1/auth/change-password"
-    const res = await API.post(uri, data)
-    return res
-}
+  const changepassword = (data) => {
+    return api.makeRequest({
+      url: "/api/v1/auth/change-password",
+      method: "POST",
+      data: data,
+    });
+  };
+  
 
 
 export default authServices = {
-    login, register, changePassword
+    login, register, changepassword
 }

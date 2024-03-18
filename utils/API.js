@@ -13,7 +13,7 @@ const API = axios.create({
     baseURL: serverConfig.server,
     headers: {
         // 'content-type':'multipart/form-data'
-        'content-type': 'application/json'
+        'content-type': 'application/json',
     },
     // paramsSerializer: params => queryString.stringify(params)
     // paramsSerializer: params => JSON.stringify(params)
@@ -24,30 +24,29 @@ API.interceptors.request.use(async (config) => {
     //hanlde tooken...
     config.headers = {
         ...(config.headers ?? {}),
-        Authorization: `Bearer ${getAuthToken()}`
+        Authorization: `Bearer ${await getAuthToken()}`
     }
     return { ...config }
 })
 
-API.interceptors.response.use((response) => {
+API.interceptors.response.use(async (response) => {
     if (response && response.data) {
         return response.data
     }
     return response
-}, (error) => {
+},async (error) => {
     const status = error.response ? error.response.status : null
     const originalConfig = error.config
-    console.log("error", error)
     // Access Token was expired
     if (status === 401) {
-        return  Auth.refreshToken().then(res => {
-            error.config.headers['Authorization'] = `Bearer ${getAuthToken()}`
+        return  Auth.refreshToken().then(async res => {
+            error.config.headers['Authorization'] = `Bearer ${await getAuthToken()}`
             return API(error.config)
         })
     }
     if (status === 408) {
         // window.localStorage.clear()
-        AsyncStorage.clear()
+        await AsyncStorage.clear()
         window.location.href = '/login'
     }
     return Promise.reject(error)

@@ -19,8 +19,7 @@ import { useState, useEffect } from "react";
 import CardOrder from "../components/CardOrder";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useNavigation} from "@react-navigation/native"
-
-
+import { orderService } from "../utils/services/invoiceServices";
 
 const data = [];
 for (let i = 0; i < 10; i++) {
@@ -44,26 +43,43 @@ const OrderScreen = () => {
   const [data, setData] = useState([]);
   const [isLoading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
+  const [total, setTotal] = useState(2)
 
-  useEffect(() => {
-    fetchData();
+  useEffect(() => { 
+      fetchData()
+    // }
   }, []);
 
-  const fetchData = () => {
-    setLoading(true);
-    // Thực hiện gọi API để lấy dữ liệu mới
-    // Ví dụ: fetch(`your_api_endpoint?page=${page}`)
-    // Sau đó cập nhật dữ liệu và tăng số trang
-    // setData(newData);
-    // setPage(page + 1);
-    // setLoading(false);
-    // Trong ví dụ này, tôi sẽ sử dụng setTimeout để giả lập việc gọi API
-    setTimeout(() => {
-      const newData = Array.from({ length: 10 }, (_, index) => ({ id: index + data.length, name: `Item ${index + data.length}` }));
-      setData([...data, ...newData]);
-      setPage(page + 1);
-      setLoading(false);
-    }, 1000);
+  const fetchData = async () => {
+    if (data.length < total) {
+      setLoading(true)
+    orderService.listAll({
+        page: page,
+        size: 10
+    }).then((res) => {
+       console.log(res)
+      //  setLoading(false)
+      if (Array.isArray(res?.data?.data)) {
+        const temp = res?.data?.data.map((item, index) => {
+          return {
+            key: item?.id,
+            ...item
+
+          }
+        })
+        setTotal(res?.data?.TotalPage)
+        setData([...data,...temp])
+       if (res?.data?.data.length > 0) {
+        setPage(page + 1)
+       }
+        setLoading(false)
+      }
+    }).catch(err => {
+      console.log(err)
+      setLoading(false)
+      // setLoading(false)
+    })
+    }
   };
 
   const renderFooter = () => {
@@ -93,14 +109,8 @@ const OrderScreen = () => {
               className="h-9 w-40 rounded-full"
             />
           </View>
-          <TouchableOpacity onPress={async () => {
-                        dispatch(actions.AuthActions.userInfo({name:"Hoang Nam", age: 20}))
-                        await AsyncStorage.setItem("access_token", "ojfef")
-                        // authServices.login({username: "admin", password: "1"}).then((res) => {
-                        //   console.log(res)
-                        // })
-                      }}>
-              <BellIcon onPress={() =>  console.log("check access_token", AsyncStorage.getItem("access_token"))} size="27" color="rgb(179, 179, 179)" />
+          <TouchableOpacity onPress={async () => console.log( await AsyncStorage.getItem("access_token"))}>
+              <BellIcon size="27" color="rgb(179, 179, 179)" />
           </TouchableOpacity>
         </View>
         <View className="h-10 flex-row items-center mr-2 ml-2 justify-between">
