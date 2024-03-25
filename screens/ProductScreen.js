@@ -8,86 +8,99 @@ import {
    ActivityIndicator,
    
   } from "react-native";
-  import { SafeAreaView } from "react-native-safe-area-context";
-  import { useState, useEffect } from "react";
-  import { BellIcon, ArrowLeftIcon, MagnifyingGlassIcon, ChevronRightIcon, ChevronLeftIcon, ChevronUpIcon } from "react-native-heroicons/outline";
-  import {useNavigation} from "@react-navigation/native"
-  import CardProduct from "../components/CardProduct";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { useState, useEffect } from "react";
+import { BellIcon, ArrowLeftIcon, MagnifyingGlassIcon, ChevronRightIcon, ChevronLeftIcon, ChevronUpIcon } from "react-native-heroicons/outline";
+import {useNavigation} from "@react-navigation/native"
+import CardProduct from "../components/CardProduct";
 import BottomSheetProduct from "../components/BottomSheetProduct";
-  const categoreis = [
-    {
-        id: 1,
-        title: "Cappuccino",
-      },
-      {
-        id: 2,
-        title: "Latte",
-      },
-      {
-        id: 3,
-        title: "Espresso",
-      },
-      {
-        id: 4,
-        title: "Mocha",
-      },
-      {
-        id: 5,
-        title: "Americano",
-      },
-      {
-        id: 6,
-        title: "Cafe sữa đã",
-      },
-      {
-        id: 7,
-        title: "Cafe đá xay",
-      },
-      {
-        id: 8,
-        title: "Cafe chồn",
-      },
-]
+import { productServices } from "../utils/services/productServices";
+import { categoryServices } from "../utils/services/categoryServices";
 
-const data = [];
-for (let i = 0; i < 10; i++) {
-  data.push({
-    index: i
-  });
-}
 
 
 const ProductScreen = (props) => {
     const navigation = useNavigation()
-    const id_table = props.route.params
-    const [activeCategory, setActiveCategory] = useState(1)
+    const table = props.route.params
+    const [activeCategory, setActiveCategory] = useState()
     const [visible, setVisible] = useState(false)
 
     const [data, setData] = useState([]);
   const [isLoading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
+  const [total, setTotal] = useState(2)
+  const [changeInputText, setChangeTextInput] = useState()
+  const [search, setSearch] = useState();
+
+  const [categories, setCategories] = useState([])
+  const fetchData = () => {
+    if (data.length < total) {
+      setLoading(true);
+    productServices.listAll({
+      page: page,
+      size: 10,
+      ...(activeCategory && {id_category: activeCategory}),
+      ...(search && search != "" && {name : search})
+    }).then((res) => {
+      if (Array.isArray(res?.data?.data)) {
+        const temp = res?.data?.data.map((item) => {
+          return {
+            key: item?.id,
+            ...item
+          }
+        })
+        setData([...data, ... temp])
+        setTotal(res?.data?.TotalPage)
+        if (res?.data?.data.length > 0) {
+          setPage(page + 1)
+         }
+          setLoading(false)
+        
+      }
+    }).catch(err => {
+      console.log(err)
+      setLoading(false)
+    })
+    }
+  };
+
+
+
+
+  const getCategory = () => {
+    categoryServices.get({
+      page: 1,
+      size: 100
+    }).then((res) => {
+      if (Array.isArray(res?.data?.data)) {
+        const temp = res?.data?.data.map((item) => {
+          return {
+            id: item?.id,
+            title: item?.name || ""
+          }
+        })
+        const  all = {
+          id: null,
+          title:"Tất cả"
+        }
+        setCategories([...[all],...temp])
+      }
+
+    }).catch(err => {
+        console.log(err)
+    })
+  }
+
+  useEffect(() => {
+    
+    getCategory()
+  }, []);
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [activeCategory])
 
-  const fetchData = () => {
-    setLoading(true);
-    // Thực hiện gọi API để lấy dữ liệu mới
-    // Ví dụ: fetch(`your_api_endpoint?page=${page}`)
-    // Sau đó cập nhật dữ liệu và tăng số trang
-    // setData(newData);
-    // setPage(page + 1);
-    // setLoading(false);
-    // Trong ví dụ này, tôi sẽ sử dụng setTimeout để giả lập việc gọi API
-    setTimeout(() => {
-      const newData = Array.from({ length: 10 }, (_, index) => ({ id: index + data.length, name: `Item ${index + data.length}` }));
-      setData([...data, ...newData]);
-      setPage(page + 1);
-      setLoading(false);
-    }, 1000);
-  };
-
+ 
   const renderFooter = () => {
     return isLoading ? (
       <View style={{ paddingVertical: 20 }}>
@@ -95,6 +108,20 @@ const ProductScreen = (props) => {
       </View>
     ) : null;
   };
+
+  const hanldeActiceCategory = (item) => {
+    setActiveCategory(item.id)
+    setPage(1)
+    setTotal(2)
+    setData([])
+  }
+
+  const handleSubmitEditing = () => {
+   setSearch(changeInputText)
+   setPage(1)
+   setTotal(2)
+   setData([])
+  }
 
     return (
         <View style={{backgroundColor:"#F1F1F1"}} className="flex-1  relative box-border">
@@ -111,10 +138,6 @@ const ProductScreen = (props) => {
             </TouchableOpacity>
   
             <View className="flex-row items-center space-x-2">
-              {/* <Image
-                source={require("../assets/logo4.png")}
-                className="h-9 w-40 rounded-full"
-              /> */}
               <Text className="font-semibold" style={{fontSize:20}}>Sản phẩm</Text>
             </View>
             <BellIcon size="27" color="rgb(179, 179, 179)" />
@@ -122,27 +145,25 @@ const ProductScreen = (props) => {
            {/* search bar */}
            <View className="mx-5 mt-6">
                         <View className="flex-row justify-center items-center rounded-full p-1 bg-[#e6e6e6]">
-                            <TextInput placeholder="Tìm kiếm" className="p-2 flex-1 font-semibold text-gray-700"/>
+                            <TextInput onSubmitEditing={() => handleSubmitEditing()} onChangeText={(search) => setChangeTextInput(search)} placeholder="Tìm kiếm" className="p-2 flex-1 font-semibold text-gray-700"/>
                             <TouchableOpacity className="rounded-full p-2" style={{backgroundColor:"rgb(179, 179, 179)"}}>
                                 <MagnifyingGlassIcon size="25" strokeWidth={2} color="white"/>
                             </TouchableOpacity>
                         </View>
             </View>
-           <View className="px-5 mt-6">
+           <View className="px-5 mt-6"> 
                 <FlatList
+                    
                         horizontal
                         showsHorizontalScrollIndicator={false}
-                        data={categoreis}
-                        
+                        data={categories}                      
                         keyExtractor={item => item.id}
                         className="overflow-visible"
                         renderItem={({item}) => {
                             const isActive =item.id == activeCategory
                             return (
-                                <TouchableOpacity onPress={() => setActiveCategory(item.id)} style={{backgroundColor: isActive ? "#0080ff" : 'white', borderRadius:10}}  className="p-2 x-5  mr-2 shadow">
+                                <TouchableOpacity onPress={() => hanldeActiceCategory(item)} style={{backgroundColor: isActive ? "#0080ff" : 'white', borderRadius:10}}  className="p-2 x-5  mr-2 shadow">
                                     <Text style={{color: isActive ? "white" : "black"}} className={isActive ? "font-semibold": "font-normal"}>{item.title}</Text>
-                                   
-
                                 </TouchableOpacity>
                             )
                         }}
@@ -157,7 +178,7 @@ const ProductScreen = (props) => {
                 <View className="h-full w-11/12 ">
                     <FlatList
                         data={data}
-                        renderItem={(item) => <CardProduct item={item}/>}
+                        renderItem={({item}) => <CardProduct item={item}/>}
                         keyExtractor={item => item.id.toString()}
                         onEndReached={fetchData}
                         onEndReachedThreshold={0.5}

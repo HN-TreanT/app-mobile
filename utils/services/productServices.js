@@ -2,7 +2,7 @@ import createApiServices from "../createApiServices";
 const api = createApiServices();
 
 
-const listAll = async (data) => {
+const listAll = async (params) => {
     return api.makeAuthRequest({
         url: `/api/v1/product`,
         method: "GET",

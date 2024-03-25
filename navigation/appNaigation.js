@@ -9,6 +9,7 @@ const Stack = createNativeStackNavigator();
 import HomeTab from "../components/HomeTab";
 import HomeTab2 from "../components/HomeTab2";
 import LoginScreen from "../screens/LoginScreen";
+import TableScreen from "../screens/TableScreen";
 
 // const Tab = createBottomTabNavigator()
 
@@ -22,6 +23,7 @@ export default function AppNavigation() {
                 <Stack.Screen name="Product" options={{headerShown: false}} component={ProductScreen}></Stack.Screen>
 
                 <Stack.Screen name="DetailOrder" options={{headerShown: false}} component={DetailOrderScreen}></Stack.Screen>
+                <Stack.Screen name="Table" options={{headerShown:false}} component={TableScreen}></Stack.Screen>
 
             </Stack.Navigator>
         </NavigationContainer>

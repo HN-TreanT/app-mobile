@@ -15,19 +15,12 @@ import authServices from "../utils/services/authServices";
 import { Bars3Icon } from "react-native-heroicons/solid";
 import { BellIcon } from "react-native-heroicons/outline";
 import { CreditCardIcon as CreditCardSolid, PlusIcon } from "react-native-heroicons/solid";
-import { useState, useEffect } from "react";
+import React , { useState, useEffect } from "react";
 import CardOrder from "../components/CardOrder";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useNavigation} from "@react-navigation/native"
 import { orderService } from "../utils/services/invoiceServices";
-
-const data = [];
-for (let i = 0; i < 10; i++) {
-  data.push({
-    index: i
-  });
-}
-
+import {useFocusEffect} from "@react-navigation/native"
 const OrderScreen = () => {
  
   const navigation = useNavigation()
@@ -38,26 +31,46 @@ const OrderScreen = () => {
 
   ///
   const [isEnabled, setIsEnabled] = useState(false);
-  const toggleSwitch = () => setIsEnabled((previousState) => !previousState);
+ 
 
   const [data, setData] = useState([]);
   const [isLoading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(2)
 
+  const toggleSwitch = () => {
+    setIsEnabled((previousState) => !previousState)
+    setPage(1)
+    setData([])
+  };
+
   useEffect(() => { 
       fetchData()
     // }
-  }, []);
+  }, [isEnabled]);
+
+  
+  // useFocusEffect(
+  //   React.useCallback(() => {
+  //     fetchData();
+  //     return () => {};
+  //   }, [])
+  // )
 
   const fetchData = async () => {
     if (data.length < total) {
       setLoading(true)
+    let thanh_toan = "chua"
+    if(isEnabled) {
+      thanh_toan = "thanhtoan"
+    } else {
+     thanh_toan = "chua"
+    }
     orderService.listAll({
         page: page,
-        size: 10
+        size: 10,
+        thanh_toan: thanh_toan
     }).then((res) => {
-       console.log(res)
       //  setLoading(false)
       if (Array.isArray(res?.data?.data)) {
         const temp = res?.data?.data.map((item, index) => {
@@ -151,7 +164,7 @@ const OrderScreen = () => {
                 <View className="h-full w-11/12 ">
                     <FlatList
                         data={data}
-                        renderItem={(item) => <CardOrder item={item}/>}
+                        renderItem={({item}) => <CardOrder item={item}/>}
                         keyExtractor={item => item.id.toString()}
                         onEndReached={fetchData}
                         onEndReachedThreshold={0.5}

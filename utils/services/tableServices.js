@@ -1,9 +1,9 @@
-import CreateApiService from "../createApiService";
+import CreateApiService from "../createApiServices";
 const api = CreateApiService();
 
 
 
-const listAll = async (data) => {
+const listAll = async (params) => {
     return api.makeAuthRequest({
         url: `/api/v1/table-food`,
         method: "GET",

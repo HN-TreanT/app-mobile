@@ -16,8 +16,8 @@ const LoginScreen = () => {
     const dispatch = useDispatch()
     const actions = useActions()
     const [activeCategory, setActiveCategory] = useState(1)
-    const [username, setUsername] = useState()
-    const [password, setPassword] = useState()
+    const [username, setUsername] = useState("admin")
+    const [password, setPassword] = useState("1")
     const [errorMessageUsername, setErrorMessageUsername] = useState("")
     const [errorMessagePassword, setErrorMessagePassword] = useState("") 
 
@@ -34,6 +34,7 @@ const LoginScreen = () => {
             username: username,
             password: password
         }).then(async (res) => {
+      
             dispatch(actions.AuthActions.userInfo(res?.data))
             await AsyncStorage.setItem("access_token", res?.data.access_token)
             await AsyncStorage.setItem("refresh_token", res?.data.refresh_token)
@@ -64,6 +65,7 @@ const LoginScreen = () => {
 
                         <View className="w-3/4 flex-col items-start mt-7 justify-start">
                             <Input 
+                            value="admin"
                             leftIcon={ <UserIcon size="25" color="rgb(179, 179, 179)" /> }
                             label="Tên đăng nhập" 
                             className="w-full" 
@@ -78,7 +80,7 @@ const LoginScreen = () => {
                              placeholder="Tên đăng nhập" renderErrorMessage={true}
                              errorMessage={errorMessageUsername}
                               ></Input>
-                            <Input label="Mật khẩu" 
+                            <Input value="1" label="Mật khẩu" 
                             errorMessage={errorMessagePassword}
                             renderErrorMessage={true}
                             leftIcon={ <LockClosedIcon size="25" color="rgb(179, 179, 179)" /> }

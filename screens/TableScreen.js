@@ -13,22 +13,55 @@ import {
   
   import { Bars3Icon } from "react-native-heroicons/solid";
   import { BellIcon } from "react-native-heroicons/outline";
-  import { CreditCardIcon as CreditCardSolid } from "react-native-heroicons/solid";
-  import { useState, useEffect } from "react";
-  import CardOrder from "../components/CardOrder";
+  import React, { useEffect, useState, useCallback } from "react";
   import CardTable from "../components/CardTable";
-  const data = [];
-  for (let i = 0; i < 100; i++) {
-    data.push({
-      title: i,
-      id:i
-    });
-  }
+  import { tableSerivces } from "../utils/services/tableServices";
+  import {useFocusEffect, useIsFocused} from "@react-navigation/native"
+
   
   const TableScreen = () => {
-  
- 
-  
+    const isFocused = useIsFocused(); 
+
+    const [dataSource, setDataSource] = useState([])
+    const [isLoading, setIsLoading] = useState(false)
+    const [page, setPage] = useState(1)
+    const [total, setTotal] = useState(2)
+
+    const fetchData = async () => {
+      if (dataSource.length < total) {
+        setIsLoading(true)
+        tableSerivces.listAll({
+          page: page,
+          size: 24
+        }).then((res) => {
+          if (Array.isArray(res?.data?.data)) {
+            const temp = res?.data?.data.map((item, index) => {
+              return {
+                key: item?.id,
+                ...item
+    
+              }
+            })
+            setTotal(res?.data?.TotalPage)
+            setDataSource([...dataSource,...temp])
+            if (res?.data?.data.length > 0) {
+              setPage(page + 1)
+             }
+              setIsLoading(false)
+          }
+
+        }).catch(err => {
+          console.log(err)
+        })
+      }
+    }
+    
+    useEffect(() => {
+        if (isFocused) {
+          fetchData()
+        }
+    }, [isFocused])
+
     
     return (
       <View className="flex-1 mb-24 relative bg-white box-border">
@@ -82,11 +115,12 @@ import {
               style={{ backgroundColor: "#e6f5ff" }}
               className="h-full w-3/4 flex-row justify-center pl-6"
             >    
-                 <ScrollView  className="h-full w-full "> 
+                 <ScrollView onTouchEnd={() => console.log("end")} className="h-full w-full "> 
                     <View className="h-full w-full flex-row " style={{flexWrap: 'wrap'}}>
                         {
-                            data.map((item) => {
-                            return  <CardTable key={item.id} item={item.title}/>
+                            dataSource.map((item, index) => {
+                            return  <CardTable key={index} item={item}/>
+                            // return <div>{item}</div>
                             })
                         }
                     </View>
