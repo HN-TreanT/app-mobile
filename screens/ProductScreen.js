@@ -16,14 +16,20 @@ import CardProduct from "../components/CardProduct";
 import BottomSheetProduct from "../components/BottomSheetProduct";
 import { productServices } from "../utils/services/productServices";
 import { categoryServices } from "../utils/services/categoryServices";
-
-
+import {useDispatch, useSelector} from "react-redux"
+import actions from "../redux/order/actions";
+import { convertPrice } from "../utils/helpers/convertPrice";
 
 const ProductScreen = (props) => {
     const navigation = useNavigation()
+    const dispatch = useDispatch()
+    const selectedOrder = useSelector((state) => state.order.selectedOrder )
+
     const table = props.route.params
     const [activeCategory, setActiveCategory] = useState()
     const [visible, setVisible] = useState(false)
+
+    const [invoiceDetails, setInvoiceDetails] = useState([])
 
     const [data, setData] = useState([]);
   const [isLoading, setLoading] = useState(false);
@@ -123,6 +129,16 @@ const ProductScreen = (props) => {
    setData([])
   }
 
+  const handleNextPage = () => {
+    
+    const newSelectedOrder = {
+      ...selectedOrder,
+      lst_invoice_detail: invoiceDetails
+    }
+    dispatch(actions.action.selectedOrder(newSelectedOrder))
+    navigation.navigate("DetailOrder")
+  }
+
     return (
         <View style={{backgroundColor:"#F1F1F1"}} className="flex-1  relative box-border">
         <SafeAreaView className="flex-1">
@@ -133,7 +149,10 @@ const ProductScreen = (props) => {
             }}
             className="px-4 pb-4 mr-2 ml-2 pt-2 flex-row justify-between items-center"
           >
-            <TouchableOpacity className=" rounded-full" onPress={() => navigation.goBack()}>
+            <TouchableOpacity className=" rounded-full" onPress={() => {
+              navigation.goBack()
+              dispatch(actions.action.selectedOrder({}))
+            }}>
               <ArrowLeftIcon size="27" color="rgb(179, 179, 179)" />
             </TouchableOpacity>
   
@@ -145,13 +164,13 @@ const ProductScreen = (props) => {
            {/* search bar */}
            <View className="mx-5 mt-6">
                         <View className="flex-row justify-center items-center rounded-full p-1 bg-[#e6e6e6]">
-                            <TextInput onSubmitEditing={() => handleSubmitEditing()} onChangeText={(search) => setChangeTextInput(search)} placeholder="Tìm kiếm" className="p-2 flex-1 font-semibold text-gray-700"/>
+                            <TextInput onSubmitEditing={() => handleSubmitEditing()} onChangeText={(search) => setChangeTextInput(search)} placeholder="Tìm kiếm" className="p-1 flex-1 font-semibold text-gray-700"/>
                             <TouchableOpacity className="rounded-full p-2" style={{backgroundColor:"rgb(179, 179, 179)"}}>
                                 <MagnifyingGlassIcon size="25" strokeWidth={2} color="white"/>
                             </TouchableOpacity>
                         </View>
             </View>
-           <View className="px-5 mt-6"> 
+           <View className="h-10 px-5 mt-6"> 
                 <FlatList
                     
                         horizontal
@@ -172,13 +191,13 @@ const ProductScreen = (props) => {
 
            {/* list order */}
           <View
-             style={{height:560}}
-            className=" w-full flex-row mt-4  justify-center "
+             style={{height:444}}// treen oppo laf 444, tren may ao laf 590
+             className=" w-full flex-row mt-4  justify-center "
           >    
                 <View className="h-full w-11/12 ">
                     <FlatList
                         data={data}
-                        renderItem={({item}) => <CardProduct item={item}/>}
+                        renderItem={({item}) => <CardProduct invoiceDetails={invoiceDetails} setInvoiceDetails={setInvoiceDetails} item={item}/>}
                         keyExtractor={item => item.id.toString()}
                         onEndReached={fetchData}
                         onEndReachedThreshold={0.5}
@@ -201,15 +220,15 @@ const ProductScreen = (props) => {
               <View style={{borderTopColor:"#e6e6e6", borderTopWidth: 1}}  className=" mr-2 ml-2 h-14 w-full flex-row items-center justify-between" >
               
                   <View style={{marginLeft:7}}>
-                    <Text style={{fontSize: 15}}  className="font-medium ">Thành tiền: 40.000đ</Text>
-                    <Text style={{color:"rgb(179, 179, 179)"}}  className="font-semibold ">Đặt hàng: 4</Text>
+                    <Text style={{fontSize: 15}}  className="font-medium ">Thành tiền: {convertPrice(invoiceDetails.reduce((sum, acc) => sum + acc?.price , 0))}</Text>
+                    <Text style={{color:"rgb(179, 179, 179)"}}  className="font-semibold ">Đặt hàng: {invoiceDetails.length}</Text>
                   </View>
-                  <TouchableOpacity onPress={() => navigation.navigate("DetailOrder")} style={{backgroundColor:  "#0080ff" , borderRadius:10, marginRight:15}}  className="p-2 flex-row items-center">
+                  <TouchableOpacity onPress={() => handleNextPage()} style={{backgroundColor:  "#0080ff" , borderRadius:10, marginRight:15}}  className="p-2 flex-row items-center">
                         <Text style={{color: "white"}} className="font-semibold">Tiếp theo</Text>
                         <ChevronRightIcon size="20" color="white" />
                   </TouchableOpacity>
               </View>
-              <BottomSheetProduct visible={visible} setIsVisible={setVisible}/>
+              <BottomSheetProduct invoiceDetails={invoiceDetails} setInvoiceDetails={setInvoiceDetails} visible={visible} setIsVisible={setVisible}/>
          </View>
        
         </SafeAreaView>

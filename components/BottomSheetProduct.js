@@ -3,6 +3,9 @@ import {BottomSheet } from "@rneui/themed"
 import { ChevronDownIcon, ChevronRightIcon } from "react-native-heroicons/outline";
 import {useNavigation} from "@react-navigation/native"
 import CardDetailProductAddOrder from "./CardDetailProductAddOrder";
+import { convertPrice } from "../utils/helpers/convertPrice";
+import {useDispatch, useSelector} from "react-redux"
+import actions from "../redux/order/actions";
 const data = [];
 for (let i = 0; i < 5; i++) {
   data.push({
@@ -12,9 +15,24 @@ for (let i = 0; i < 5; i++) {
 }
 
 
-const BottomSheetProduct = ({visible, setIsVisible}) => {
+const BottomSheetProduct = ({visible, setIsVisible, invoiceDetails, setInvoiceDetails}) => {
     const navigation = useNavigation()
     // const [data, setData] = useState([]);
+    const dispatch = useDispatch()
+    const selectedOrder = useSelector((state) => state.order.selectedOrder )
+
+
+    const handleNextPage = () => {
+    
+        const newSelectedOrder = {
+          ...selectedOrder,
+          lst_invoice_detail: invoiceDetails
+        }
+        dispatch(actions.action.selectedOrder(newSelectedOrder))
+        setIsVisible(false)
+        navigation.navigate("DetailOrder")
+      }
+    
 
 
     return (
@@ -33,8 +51,8 @@ const BottomSheetProduct = ({visible, setIsVisible}) => {
                     <View className="h-72 w-full flex-row mt-2  justify-center" >
                         <ScrollView style={styles.scrollView}>
                             {
-                                data.map((item, index) => {
-                                    return <CardDetailProductAddOrder key={index} data={item}/>
+                                invoiceDetails.map((item, index) => {
+                                    return <CardDetailProductAddOrder key={index} data={item} invoiceDetails={invoiceDetails} setInvoiceDetails={setInvoiceDetails}/>
                                 })
                             }
                         </ScrollView>
@@ -51,18 +69,15 @@ const BottomSheetProduct = ({visible, setIsVisible}) => {
                            
                     </View>
                     <View className="p-2" style={{borderTopColor:"#e6e6e6", borderTopWidth:1}}>
-                       <Text style={{fontSize:15, marginBottom:2}} className="font-semibold">Tạm tính: 40.000đ</Text>
+                       <Text style={{fontSize:15, marginBottom:2}} className="font-semibold">Tạm tính: {convertPrice(invoiceDetails.reduce((sum, acc) => sum + acc?.price , 0))}</Text>
                     </View>
                     <View style={{borderTopColor:"#e6e6e6", borderTopWidth: 1}}  className=" mr-2 ml-2 h-14 w-full flex-row items-center justify-between" >
                         
                         <View >
-                            <Text style={{fontSize: 15}}  className="font-medium ">Thành tiền: 40.000đ</Text>
-                            <Text style={{color:"rgb(179, 179, 179)"}}  className="font-semibold ">Đặt hàng: 4</Text>
+                            <Text style={{fontSize: 15}}  className="font-medium ">Thành tiền: {convertPrice(invoiceDetails.reduce((sum, acc) => sum + acc?.price , 0))}</Text>
+                            <Text style={{color:"rgb(179, 179, 179)"}}  className="font-semibold ">Đặt hàng: {invoiceDetails.length}</Text>
                         </View>
-                        <TouchableOpacity onPress={() => {
-                            setIsVisible(false)
-                            navigation.navigate("DetailOrder")
-                        }} style={{backgroundColor:  "#0080ff" , borderRadius:10, marginRight:15}}  className="p-2 flex-row items-center">
+                        <TouchableOpacity onPress={() => handleNextPage()} style={{backgroundColor:  "#0080ff" , borderRadius:10, marginRight:15}}  className="p-2 flex-row items-center">
                                 <Text style={{color: "white"}} className="font-semibold">Tiếp theo</Text>
                                 <ChevronRightIcon size="20" color="white" />
                         </TouchableOpacity>

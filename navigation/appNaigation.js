@@ -11,9 +11,6 @@ import HomeTab2 from "../components/HomeTab2";
 import LoginScreen from "../screens/LoginScreen";
 import TableScreen from "../screens/TableScreen";
 
-// const Tab = createBottomTabNavigator()
-
-
 export default function AppNavigation() {
     return (
         <NavigationContainer>

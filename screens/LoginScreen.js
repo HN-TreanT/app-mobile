@@ -1,6 +1,6 @@
 import { View, Text, Image, TextInput, TouchableOpacity, FlatList } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useState } from "react";
+import { useState, useContext } from "react";
 import {BottomSheet, Button, ListItem } from "@rneui/themed"
 import {useNavigation} from "@react-navigation/native"
 import authServices from "../utils/services/authServices";
@@ -9,9 +9,10 @@ import useActions from "../redux/useActions";
 import {useDispatch, useSelector} from "react-redux"
 import { Input } from '@rneui/themed';
 import {UserIcon, LockClosedIcon} from "react-native-heroicons/solid"
-
+import {AppContext} from "../context/appContext"
 
 const LoginScreen = () => {
+    const {socket} = useContext(AppContext)
     const navigation = useNavigation()
     const dispatch = useDispatch()
     const actions = useActions()
@@ -38,6 +39,8 @@ const LoginScreen = () => {
             dispatch(actions.AuthActions.userInfo(res?.data))
             await AsyncStorage.setItem("access_token", res?.data.access_token)
             await AsyncStorage.setItem("refresh_token", res?.data.refresh_token)
+            socket.disconnect();
+            socket.connect();
             navigation.navigate("Home")
         }).catch(err => {
             console.log(err)

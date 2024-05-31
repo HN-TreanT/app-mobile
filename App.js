@@ -4,21 +4,14 @@ import { ThemeProvider } from '@rneui/themed';
 import AppNavigation from './navigation/appNaigation';
 import {Provider} from "react-redux"
 import {store} from "./redux/store"
+import { AppContext, socket } from './context/appContext';
 export default function App() {
-  // return (
-  //   <View style={styles.container}>
-  //     <Text>Hello world Nguyễn Hoàng dang cap cap oke chot don!</Text>
-  //     <StatusBar style="auto" />
-  //   </View>
-  // );
-  return <Provider store={store} ><ThemeProvider><AppNavigation /></ThemeProvider></Provider>
-}
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+  return <Provider store={store} >
+             <ThemeProvider>
+               <AppContext.Provider value={{socket}}>
+                 <AppNavigation />
+              </AppContext.Provider>
+             </ThemeProvider>
+          </Provider>
+}

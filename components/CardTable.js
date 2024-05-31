@@ -1,18 +1,27 @@
 import React from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 import {useNavigation} from "@react-navigation/native"
-
+import {useDispatch, useSelector} from "react-redux"
+import actions from "../redux/order/actions";
 const CardTable = ({item}) => {
     const navigation = useNavigation()
+    const dispatch = useDispatch()
+
     let active = false
 
     if (item.status) {
         active = true
     }
 
+    const handleClickCardTable = () => {
+        dispatch(actions.action.selectedOrder({
+            id_tables: [item.id]
+        }))
+        navigation.navigate("Product", item)
+    }
     return (
        <TouchableOpacity
-         onPress={() => navigation.navigate("Product", item)}
+         onPress={() => handleClickCardTable()}
        >
            <View     
                 style={{
@@ -20,10 +29,10 @@ const CardTable = ({item}) => {
                     borderRadius:10,
                 
                 
-                }} className="w-20 mr-2 mt-2 mb-1 h-20 flex-col justify-center items-center"
+                }} className="w-16 mr-3 mt-2 mb-1 h-16 flex-col justify-center items-center"
             >
         
-            <Text className="font-bold" style={{fontSize:18, padding:2, paddingRight:6, color: active ? "white" : "black",
+            <Text className="font-bold" style={{fontSize:14, padding:2, paddingRight:6, color: active ? "white" : "black",
                 paddingLeft:6, borderBottomColor:"rgb(179, 179, 179)", borderBottomWidth:1}}>{item?.name ? item?.name : ""}</Text>
                 <Text style={{color:active ? "white" : "rgb(170, 170, 170)"}}>{active ? "Có người" : "Bàn trống"}</Text>
             </View>

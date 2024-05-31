@@ -69,7 +69,8 @@ const OrderScreen = () => {
     orderService.listAll({
         page: page,
         size: 10,
-        thanh_toan: thanh_toan
+        thanh_toan: thanh_toan,
+        createdAt: "DESC"
     }).then((res) => {
       //  setLoading(false)
       if (Array.isArray(res?.data?.data)) {
@@ -103,7 +104,7 @@ const OrderScreen = () => {
     ) : null;
   };
   return (
-    <View className="flex-1 mb-24 relative bg-white box-border">
+    <View className="flex-1 mb-16 relative bg-white box-border">
       <SafeAreaView className="flex-1">
         <View
           style={{
@@ -127,7 +128,7 @@ const OrderScreen = () => {
           </TouchableOpacity>
         </View>
         <View className="h-10 flex-row items-center mr-2 ml-2 justify-between">
-          <Text className="font-semibold opacity-70">Tổng số đơn: 764</Text>
+          <Text className="font-semibold opacity-70">Tổng số đơn: {total}</Text>
           <View className="flex-row items-center">
             <Text className="font-semibold opacity-70">Thanh toán</Text>
             <Switch
@@ -182,10 +183,10 @@ const OrderScreen = () => {
         <View style={{
               position: "fixed",
               backgroundColor:"#0080ff",
-              top: 50,
-              botiom: 20,
-              right: 200,
-              left: 360,
+              // top: 50,
+              bottom: -40,
+              right: 0,
+              left: 315,
               width: 30,
               height: 30
             }}>

@@ -7,7 +7,8 @@ import {
     FlatList,
    ActivityIndicator,
    TouchableWithoutFeedback,
-   StyleSheet
+   StyleSheet,
+   ScrollView
    
   } from "react-native";
   import { SafeAreaView } from "react-native-safe-area-context";
@@ -25,28 +26,25 @@ import {
   import CardOrderDetail from "../components/CardOrderDetail";
   import {BottomSheet, Button, ListItem } from "@rneui/themed"
   import {SafeAreaProvider} from "react-native-safe-area-context"
-const data = [];
-for (let i = 0; i < 10; i++) {
-  data.push({
-    index: i
-  });
-}
-
-
+  import {useDispatch, useSelector} from "react-redux"
+  import actions from "../redux/order/actions";
+import { convertPrice } from "../utils/helpers/convertPrice";
+import { orderService } from "../utils/services/invoiceServices";
+import { useContext } from "react";
+import { AppContext } from "../context/appContext";
 const DetailOrderScreen = (props) => {
+    const {socket} = useContext(AppContext)
+    const selectedOrder = useSelector((state) => state.order.selectedOrder)
+    const infoEmployee = useSelector((state) => state.auth.user_info)
+    const dispatch = useDispatch() 
     const navigation = useNavigation()
     const id_table = props.route.params
     const [activeCategory, setActiveCategory] = useState(1)
     const [visible, setIsVisible] = useState(false)
 
-    const [data, setData] = useState([]);
-  const [isLoading, setLoading] = useState(false);
-  const [page, setPage] = useState(1);
+    const [data, setData] = useState(selectedOrder?.lst_invoice_detail || []);
+  
 
-  // ClipboardDocumentCheckIcon, // gop don
-  // DocumentDuplicateIcon,// tach don
-  // DocumentMinusIcon,//huy don
-  // ArrowLeftEndOnRectangleIcon, //Chuyen ban
   const list = [
     { 
       title: 'Gộp đơn', 
@@ -70,34 +68,42 @@ const DetailOrderScreen = (props) => {
     },
   ];
 
-  useEffect(() => {
-    fetchData();
-  }, []);
+    const handleSave = () => {
+      if(selectedOrder?.id) {
 
-  const fetchData = () => {
-    setLoading(true);
-    // Thực hiện gọi API để lấy dữ liệu mới
-    // Ví dụ: fetch(`your_api_endpoint?page=${page}`)
-    // Sau đó cập nhật dữ liệu và tăng số trang
-    // setData(newData);
-    // setPage(page + 1);
-    // setLoading(false);
-    // Trong ví dụ này, tôi sẽ sử dụng setTimeout để giả lập việc gọi API
-    setTimeout(() => {
-      const newData = Array.from({ length: 10 }, (_, index) => ({ id: index + data.length, name: `Item ${index + data.length}` }));
-      setData([...data, ...newData]);
-      setPage(page + 1);
-      setLoading(false);
-    }, 1000);
-  };
+      } else {
 
-  const renderFooter = () => {
-    return isLoading ? (
-      <View style={{ paddingVertical: 20 }}>
-        <ActivityIndicator size="large" color="#0000ff" />
-      </View>
-    ) : null;
-  };
+        const dataSubmit = {
+          ...selectedOrder,
+          lst_invoice_detail: data,
+          id_employee: infoEmployee?.id
+        }
+
+        navigation.navigate("home")
+        dispatch(actions.action.selectedOrder({
+          lst_invoice_detail: [],
+          id_tables: []
+        }))
+
+        orderService.create(dataSubmit).then(res => {
+
+            if(res.status) {
+              socket.emit("change_order", {
+                status: true,
+                id_invoice: res?.id,
+                table: dataSubmit?.id_tables
+                  ? dataSubmit?.id_tables.join(",")
+                  : "",
+              });
+              navigation.navigate("Home")
+            }
+        }).catch(err => {
+          console.log(err)
+        })
+      
+
+      }
+    }
 
     return (
       <View style={{backgroundColor:"#F1F1F1"}} className="flex-1  relative box-border">
@@ -144,19 +150,25 @@ const DetailOrderScreen = (props) => {
            </View>
 
            {/* list order */}
-          <View
-             style={{height:600}}
+           <View
+             style={{height:487}} // doi voiw oppo , doi voi android studio 600
             className=" w-full flex-row mt-4  justify-center "
           >    
                 <View className="h-full w-11/12 ">
-                    <FlatList
+                    {/* <FlatList
+                      // className="overflow-visible"
                         data={data}
-                        renderItem={(item) => <CardOrderDetail item={item}/>}
-                        keyExtractor={item => item.id.toString()}
-                        onEndReached={fetchData}
+                        renderItem={({item}) => <CardOrderDetail data={data} setData={setData} item={item}/>}
+                        keyExtractor={(item,index) => index}
                         onEndReachedThreshold={0.5}
-                        ListFooterComponent={renderFooter}
-                    />
+                    /> */}
+                    <ScrollView>
+                      {
+                        Array.isArray(data) && data.map((item, index) => {
+                          return <CardOrderDetail key={index} data={data} setData={setData} item={item}/>
+                        })
+                      }
+                    </ScrollView>
                 </View>
           </View>
 
@@ -165,7 +177,7 @@ const DetailOrderScreen = (props) => {
                           
           }} className="h-32 flex-col justify-end" >
               <View style={{backgroundColor:"#eff8fe", borderWidth:1, borderColor:"#e6e6e6"}} className="m-3 flex-row justify-end items-center">
-                   <Text  style={{fontSize:15, paddingTop:4, paddingBottom:4,}} className="font-bold">Tổng: 100.000đ</Text>
+                   <Text  style={{fontSize:15, paddingTop:4, paddingBottom:4,}} className="font-bold">Tổng: {Array.isArray(selectedOrder?.lst_invoice_detail) ? convertPrice(selectedOrder?.lst_invoice_detail.reduce((sum, item) => sum + item.price, 0)) : '0 đ'}</Text>
               </View>
           
               <View className="flex-row h-14 justify-around">
@@ -175,7 +187,7 @@ const DetailOrderScreen = (props) => {
                       
                  </TouchableOpacity>
           
-                <TouchableOpacity  style={{ borderColor:"rgb(179, 179, 179)",borderWidth:1, borderRadius:10, marginRight:15}}  className="w-1/3 m-2 flex-row items-center justify-center">
+                <TouchableOpacity onPress={() => handleSave()}  style={{ borderColor:"rgb(179, 179, 179)",borderWidth:1, borderRadius:10, marginRight:15}}  className="w-1/3 m-2 flex-row items-center justify-center">
                       <Text style={{color: "rgb(179, 179, 179)"}} className="font-semibold p-2">Lưu</Text>
                   
                 </TouchableOpacity>
@@ -191,7 +203,7 @@ const DetailOrderScreen = (props) => {
           </View>
         
         </SafeAreaView>
-        <SafeAreaProvider>
+        {/* <SafeAreaProvider> */}
       
             <BottomSheet backdropStyle={styles.containerStyle} onBackdropPress={() => setIsVisible(false)}    modalProps={{
                containerStyle: styles.containerStyle
@@ -222,7 +234,7 @@ const DetailOrderScreen = (props) => {
                 
             </BottomSheet>
         
-        </SafeAreaProvider>
+        {/* </SafeAreaProvider> */}
        
       </View>
     )
