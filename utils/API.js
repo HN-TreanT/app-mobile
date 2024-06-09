@@ -14,6 +14,8 @@ const API = axios.create({
     headers: {
         // 'content-type':'multipart/form-data'
         'content-type': 'application/json',
+        'Accept': 'application/json, text/plain, */*',
+        'Cache-Control': 'no-cache'
     },
     // paramsSerializer: params => queryString.stringify(params)
     // paramsSerializer: params => JSON.stringify(params)
@@ -21,6 +23,7 @@ const API = axios.create({
 })
 
 API.interceptors.request.use(async (config) => {
+    console.log("check", config)
     //hanlde tooken...
     config.headers = {
         ...(config.headers ?? {}),
@@ -30,13 +33,21 @@ API.interceptors.request.use(async (config) => {
 })
 
 API.interceptors.response.use(async (response) => {
+    if (response.status === 304) {
+        // Handle 304 Not Modified as needed
+        console.log("Resource not modified since last request");
+        return Promise.resolve(null);
+    }
     if (response && response.data) {
         return response.data
     }
     return response
-},async (error) => {
+},
+ async (error) => {
     const status = error.response ? error.response.status : null
     const originalConfig = error.config
+    console.log(status)
+    console.log("check error", error)
     // Access Token was expired
     if (status === 401) {
         return  Auth.refreshToken().then(async res => {
@@ -50,7 +61,9 @@ API.interceptors.response.use(async (response) => {
         window.location.href = '/login'
     }
     return Promise.reject(error)
-})
+}
+
+)
 
 
 export default API

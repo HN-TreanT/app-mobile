@@ -29,7 +29,7 @@ const ProductScreen = (props) => {
     const [activeCategory, setActiveCategory] = useState()
     const [visible, setVisible] = useState(false)
 
-    const [invoiceDetails, setInvoiceDetails] = useState([])
+    const [invoiceDetails, setInvoiceDetails] = useState(selectedOrder?.lst_invoice_detail ? selectedOrder?.lst_invoice_detail : [])
 
     const [data, setData] = useState([]);
   const [isLoading, setLoading] = useState(false);

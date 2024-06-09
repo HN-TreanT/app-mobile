@@ -16,11 +16,11 @@ import {
   import React, { useEffect, useState, useCallback } from "react";
   import CardTable from "../components/CardTable";
   import { tableSerivces } from "../utils/services/tableServices";
-  import {useFocusEffect, useIsFocused} from "@react-navigation/native"
+import { useFocusEffect } from "@react-navigation/native";
+
 
   
   const TableScreen = () => {
-    const isFocused = useIsFocused(); 
 
     const [dataSource, setDataSource] = useState([])
     const [isLoading, setIsLoading] = useState(false)
@@ -51,16 +51,22 @@ import {
           }
 
         }).catch(err => {
+          setIsLoading(false)
           console.log(err)
         })
       }
     }
+
+    useFocusEffect(
+      useCallback(() => {
+          fetchData()
+          return () => console.log('table screen is unfocused');
+      }, [])
+    )
     
     useEffect(() => {
-        if (isFocused) {
           fetchData()
-        }
-    }, [isFocused])
+    }, [])
 
     
     return (
@@ -115,7 +121,12 @@ import {
               style={{ backgroundColor: "#e6f5ff" }}
               className="h-full w-3/4 flex-row justify-center pl-6"
             >    
-                 <ScrollView onTouchEnd={() => console.log("end")} className="h-full w-full "> 
+                 {
+                  isLoading  ? <View style={{ paddingVertical: 20 }}>
+                     <ActivityIndicator  size="large" color="#0000ff"/>
+                  </View> : 
+                  
+                  <ScrollView  onTouchEnd={() => console.log("end")} className="h-full w-full "> 
                     <View className="h-full w-full flex-row " style={{flexWrap: 'wrap'}}>
                         {
                             dataSource.map((item, index) => {
@@ -125,6 +136,7 @@ import {
                         }
                     </View>
                  </ScrollView>
+                 }
             </View>
           </View>
         </SafeAreaView>

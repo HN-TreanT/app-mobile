@@ -6,9 +6,12 @@ import Tag from "./Tag";
 import TagStatus from "../constants/TagStatus";
 import {useNavigation} from "@react-navigation/native"
 import { convertPrice } from "../utils/helpers/convertPrice";
-
+import { useDispatch } from "react-redux";
+import useActions from "../redux/useActions";
 const CardOrder = ({item}) => {
 
+  const dispatch = useDispatch()
+  const actions = useActions()
   const navigation = useNavigation()
   const [hiddenDropdown, setHiddenDropdown] = useState(true)
   const createdAt = new Date(item.createdAt);
@@ -31,6 +34,26 @@ const CardOrder = ({item}) => {
     time = time / 86400000;
     timeOrders = `${Math.floor(time)} ngày`;
   }
+  const handleClickCardOrder = () => {
+    const lst_invoice_detail = Array.isArray(item?.invoice_details) ?  item?.invoice_details.map((item2) => {
+      return {
+       id_invoice: item?.id,
+       id_product: !item2?.isCombo ? item2?.id_product : null,
+       id_combo: item2?.isCombo ? item2?.id_product : null,
+       isCombo: item2?.isCombo,
+       price: item2?.price,
+       amount: item2?.amount,
+       image: item2?.product?.image,
+       name: item2?.product?.name
+      }
+     }) : []
+    const dataSelected = {
+       ...item,
+       lst_invoice_detail: lst_invoice_detail
+    }
+    dispatch(actions.OrderActions.selectedOrder(dataSelected))
+    navigation.navigate("DetailOrder")
+  }
     return(
         <View style={{
             backgroundColor:"white",
@@ -47,7 +70,7 @@ const CardOrder = ({item}) => {
                 </View>
                 <View><Text className="font-semibold">MTA Coffee</Text></View>
                 <View style={{position:"relative"}} className="mr-2">
-                    <TouchableOpacity onPress={() => navigation.navigate("DetailOrder")}>
+                    <TouchableOpacity onPress={() => handleClickCardOrder()}>
                         <EllipsisHorizontalIcon size={24} color={"#0080ff"}/> 
                     </TouchableOpacity>    
                 </View>

@@ -70,6 +70,27 @@ const DetailOrderScreen = (props) => {
 
     const handleSave = () => {
       if(selectedOrder?.id) {
+        console.log(selectedOrder)
+        const lst_invoice_detail = selectedOrder?.invoice_details.map((item) => {
+          return {
+           id_invoice: selectedOrder?.id,
+           id_product: !item?.isCombo ? item?.id_product : null,
+           id_combo: item?.isCombo ? item?.id_product : null,
+           isCombo: item?.isCombo,
+           price: item?.price,
+           amount: item?.amount
+          }
+         })
+         
+         const dataSubmit = {
+           id_employee: selectedOrder?.id_employee ? selectedOrder?.id_employee : null,
+           id_customer: selectedOrder?.id_customer ? selectedOrder?.id_customer : null,
+           id_promotion: selectedOrder?.id_promotion ? selectedOrder?.id_promotion : null,
+           lst_invoice_detail: lst_invoice_detail
+    
+         }
+
+         console.log(dataSubmit)
 
       } else {
 
@@ -78,12 +99,6 @@ const DetailOrderScreen = (props) => {
           lst_invoice_detail: data,
           id_employee: infoEmployee?.id
         }
-
-        navigation.navigate("home")
-        dispatch(actions.action.selectedOrder({
-          lst_invoice_detail: [],
-          id_tables: []
-        }))
 
         orderService.create(dataSubmit).then(res => {
 
@@ -95,7 +110,11 @@ const DetailOrderScreen = (props) => {
                   ? dataSubmit?.id_tables.join(",")
                   : "",
               });
-              navigation.navigate("Home")
+              navigation.navigate("home")
+              dispatch(actions.action.selectedOrder({
+                lst_invoice_detail: [],
+                id_tables: []
+              }))
             }
         }).catch(err => {
           console.log(err)
@@ -145,7 +164,7 @@ const DetailOrderScreen = (props) => {
                      <MapPinIcon size="23" color="#0080ff" style={{marginLeft:8}} />
                      <Text className=" ml-2" style={{color:"#0080ff"}}>Ăn tại bàn</Text>
                 </View>
-                <View className="w-1/2 flex-row items-center"><Text className="ml-4">Bàn số 12</Text></View>
+                <View className="w-1/2 flex-row items-center"><Text className="ml-4">Bàn số {selectedOrder?.tablefood_invoices ? selectedOrder?.tablefood_invoices[0].id_table : ""}</Text></View>
 
            </View>
 
@@ -181,19 +200,19 @@ const DetailOrderScreen = (props) => {
               </View>
           
               <View className="flex-row h-14 justify-around">
-                 <TouchableOpacity  style={{backgroundColor:  "#24A019" , borderRadius:10, marginRight:15}}  className="w-24 m-2  flex-row items-center justify-center">
+                 <TouchableOpacity onPress={() => navigation.navigate("Product")} style={{backgroundColor:  "#cccccc" , borderRadius:10, marginRight:15}}  className="w-24 m-2  flex-row items-center justify-center">
                       <PlusCircleIcon size="20" color="white" />
                       <Text style={{color: "white"}} className="font-semibold p-2">Thêm</Text>
                       
                  </TouchableOpacity>
           
-                <TouchableOpacity onPress={() => handleSave()}  style={{ borderColor:"rgb(179, 179, 179)",borderWidth:1, borderRadius:10, marginRight:15}}  className="w-1/3 m-2 flex-row items-center justify-center">
-                      <Text style={{color: "rgb(179, 179, 179)"}} className="font-semibold p-2">Lưu</Text>
+                <TouchableOpacity onPress={() => handleSave()}  style={{ backgroundColor:"#0080ff", borderColor:"rgb(179, 179, 179)",borderWidth:1, borderRadius:10, marginRight:15}}  className="w-1/3 m-2 flex-row items-center justify-center">
+                      <Text style={{color: "white"}} className="font-semibold p-2">Lưu</Text>
                   
                 </TouchableOpacity>
 
                
-                <TouchableOpacity  style={{backgroundColor:  "#0080ff" , borderRadius:10, marginRight:15}}  className="w-1/3 m-2 flex-row items-center justify-center">
+                <TouchableOpacity  style={{backgroundColor:  "#24A019" , borderRadius:10, marginRight:15}}  className="w-1/3 m-2 flex-row items-center justify-center">
                       <Text style={{color: "white"}} className="font-semibold p-2">Thanh toán</Text>
                    
                 </TouchableOpacity>

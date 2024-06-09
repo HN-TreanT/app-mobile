@@ -15,15 +15,27 @@ import authServices from "../utils/services/authServices";
 import { Bars3Icon } from "react-native-heroicons/solid";
 import { BellIcon } from "react-native-heroicons/outline";
 import { CreditCardIcon as CreditCardSolid, PlusIcon } from "react-native-heroicons/solid";
-import React , { useState, useEffect } from "react";
+import React , { useState, useEffect, useCallback } from "react";
 import CardOrder from "../components/CardOrder";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useNavigation} from "@react-navigation/native"
 import { orderService } from "../utils/services/invoiceServices";
 import {useFocusEffect} from "@react-navigation/native"
+import { useContext } from "react";
+import { AppContext } from "../context/appContext";
+import notifyMessage from "../components/notifyMessage";
 const OrderScreen = () => {
  
   const navigation = useNavigation()
+  const {socket} = useContext(AppContext)
+  
+  socket.off("announce_success").on("announce_success", function (data) {
+    if(data?.message === "success") {
+       notifyMessage(`Yêu cầu mã #${data?.id_invoice} hoàn thành`)
+    } else {
+       
+    }
+ })
   // test
   const user_info = useSelector((state) => state.auth.user_info)
   const dispatch = useDispatch()
@@ -50,12 +62,55 @@ const OrderScreen = () => {
   }, [isEnabled]);
 
   
-  // useFocusEffect(
-  //   React.useCallback(() => {
-  //     fetchData();
-  //     return () => {};
-  //   }, [])
-  // )
+  useFocusEffect(
+    useCallback(() => {
+      // Call your API here
+      fetchDataWithFocus()
+      // Cleanup function if needed
+      return () => console.log('HomeScreen is unfocused');
+    }, [])
+  )
+
+  const fetchDataWithFocus = async () => {
+    // console.log("recall")
+    let thanh_toan = "chua"
+    if(isEnabled) {
+      thanh_toan = "thanhtoan"
+    } else {
+     thanh_toan = "chua"
+    }
+    orderService.listAll({
+        page: 1,
+        // size: thanh_toan && "hhop",
+        size: 10,
+        thanh_toan: thanh_toan,
+        createdAt: "DESC",
+        status:[0,1]
+    }).then((res) => {
+      //  setLoading(false)
+      if (Array.isArray(res?.data?.data)) {
+        const temp = res?.data?.data.map((item, index) => {
+          return {
+            key: item?.id,
+            ...item
+
+          }
+        })
+        setTotal(res?.data?.TotalPage)
+        setData(temp)
+       if (res?.data?.data.length > 0) {
+        setPage(page + 1)
+       }
+        setLoading(false)
+      }
+      setLoading(false)
+    }).catch(err => {
+      console.log(err)
+      setLoading(false)
+      // setLoading(false)
+    })
+  };
+
 
   const fetchData = async () => {
     if (data.length < total) {
@@ -70,7 +125,8 @@ const OrderScreen = () => {
         page: page,
         size: 10,
         thanh_toan: thanh_toan,
-        createdAt: "DESC"
+        createdAt: "DESC",
+        status:[0,1]
     }).then((res) => {
       //  setLoading(false)
       if (Array.isArray(res?.data?.data)) {
@@ -123,7 +179,7 @@ const OrderScreen = () => {
               className="h-9 w-40 rounded-full"
             />
           </View>
-          <TouchableOpacity onPress={async () => console.log( await AsyncStorage.getItem("access_token"))}>
+          <TouchableOpacity onPress={async () => notifyMessage("Nguyễn Hoàng Nam")}>
               <BellIcon size="27" color="rgb(179, 179, 179)" />
           </TouchableOpacity>
         </View>

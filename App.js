@@ -9,9 +9,11 @@ export default function App() {
 
   return <Provider store={store} >
              <ThemeProvider>
+               {/* <AlertProvider> */}
                <AppContext.Provider value={{socket}}>
                  <AppNavigation />
-              </AppContext.Provider>
+               </AppContext.Provider>
+               {/* </AlertProvider> */}
              </ThemeProvider>
           </Provider>
 }
