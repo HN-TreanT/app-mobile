@@ -34,14 +34,20 @@ import {
     const [total, setTotal] = useState(2)
     const navigation = useNavigation()
     const [isVisbleConfirmChangetable, setIsVisibleConfirmChangeTable] = useState(false)
+    const [idTableChangeStatus, setIdTableChangeStatus] = useState()
+    const [visibleDialog, setVisibleDialog] = useState(false)
 
 
+
+    const handleVisibleDialog = () => {
+      setVisibleDialog(!visibleDialog)
+    }
     const handleChangeVisibleConfirmChangeTable = () => {
       setIsVisibleConfirmChangeTable(!isVisbleConfirmChangetable)
     }
 
     const fetchData = async () => {
-      if (dataSource.length < total) {
+      // if (dataSource.length < total) {
         setIsLoading(true)
         tableSerivces.listAll({
           page: page,
@@ -67,7 +73,7 @@ import {
           setIsLoading(false)
           console.log(err)
         })
-      }
+      // }
     }
 
     useFocusEffect(
@@ -120,10 +126,45 @@ import {
         
     }
 
+    const handleChangeStatusTable = () => {
+       console.log(idTableChangeStatus)
+       tableSerivces.update(idTableChangeStatus, {status: 0}).then(res => {
+           console.log(res)
+           setVisibleDialog(false)
+           const updatedDataSource = dataSource.map(item => {
+            if (item.id === idTableChangeStatus) {
+                return {...item, status: 0};
+            }
+            return item;
+        });
+         
+        setDataSource(updatedDataSource);
+
+           
+       }).catch(err => {
+        console.log(err)
+        setVisibleDialog(false)
+       })
+    }
+
     
     return (
       <View className="flex-1 mb-24 relative bg-white box-border">
         <SafeAreaView className="flex-1">
+        <Dialog isVisible={visibleDialog} onBackdropPress={handleVisibleDialog}
+        >
+
+          <Dialog.Title title={`Chuyển trạng thái của bàn`}/>
+          <Dialog.Actions>
+            <Dialog.Button 
+              title="Xác nhận"
+              onPress={() => handleChangeStatusTable()}
+            />
+            <Dialog.Button title="Hủy" onPress={handleVisibleDialog} />
+          </Dialog.Actions>
+            
+        </Dialog>
+
         <Dialog isVisible={isVisbleConfirmChangetable} onBackdropPress={handleChangeVisibleConfirmChangeTable}
         >
 
@@ -201,7 +242,7 @@ import {
                     <View className="h-full w-full flex-row " style={{flexWrap: 'wrap'}}>
                         {
                             dataSource.map((item, index) => {
-                            return  <CardTable setTableSelect={setTableSelect} setIsVisibleConfirmChangeTable={setIsVisibleConfirmChangeTable} key={index} item={item}/>
+                            return  <CardTable setIdTableChangeStatus={setIdTableChangeStatus} setVisibleDialog={setVisibleDialog} setTableSelect={setTableSelect} setIsVisibleConfirmChangeTable={setIsVisibleConfirmChangeTable} key={index} item={item}/>
                             // return <div>{item}</div>
                             })
                         }

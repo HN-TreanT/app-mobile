@@ -142,19 +142,62 @@ const DetailOrderScreen = (props) => {
     }
 
 
+    const handleCustomerLeft = () => {
+      if (selectedOrder?.id) {
+        const mapIdTables = Array.isArray(selectedOrder?.tablefood_invoices)
+        ? selectedOrder?.tablefood_invoices.map((item) => {
+            return item?.id_table;
+          })
+        : [];
+        orderService
+        .update(selectedOrder?.id, { status: 3 })
+        .then(async (res) => {
+          console.log(res)
+          if (res.status) {
+            await Promise.all(
+              mapIdTables.map(async (item) => {
+                tableSerivces
+                  .update(item, { status: 0 })
+                  .then((res) => {
+                
+                  })
+                  .catch((err) => {
+                    console.log(err);
+                  });
+              })
+            );
+           
+            navigation.navigate("home")
+            dispatch(
+              actions.OrderActions.selectedOrder({
+                invoice_details: [],
+                tablefood_invoices: [],
+              })
+            );
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+      } else {
+        console.log("not selected")
+      }
+    }
+
+
   
   
 
   const list = [
+    // { 
+    //   title: 'Gộp đơn', 
+    //   icon: <ClipboardDocumentCheckIcon size={25} color={"#0080ff"} style={{marginRight:4}}/>, 
+    //   onPress: () => console.log("gop don") 
+    // },
     { 
-      title: 'Gộp đơn', 
-      icon: <ClipboardDocumentCheckIcon size={25} color={"#0080ff"} style={{marginRight:4}}/>, 
-      onPress: () => console.log("gop don") 
-    },
-    { 
-      title: 'Tách đơn', 
+      title: 'Khách rời đi', 
       icon: <DocumentDuplicateIcon size={25} color={"#0080ff"} style={{marginRight:4}}/>, 
-      onPress: () => console.log("tach don") 
+      onPress: () => handleCustomerLeft() 
     },
     { 
       title: 'Hủy đơn', 
@@ -172,7 +215,8 @@ const DetailOrderScreen = (props) => {
   ];
 
     const handleSave = async () => {
-      if(selectedOrder?.id) {         
+      if(selectedOrder?.id) {    
+          
          const dataSubmit = {
            id_employee: selectedOrder?.id_employee ? selectedOrder?.id_employee : null,
            id_customer: selectedOrder?.id_customer ? selectedOrder?.id_customer : null,
@@ -182,6 +226,13 @@ const DetailOrderScreen = (props) => {
          }
          orderService.update(selectedOrder?.id, dataSubmit).then((res) => {
             if (res.status) {
+              socket.emit("change_order", {
+                status: true,
+                id_invoice: res?.id,
+                table: dataSubmit?.id_tables
+                  ? dataSubmit?.id_tables.join(",")
+                  : "",
+              });  
               Toast.show({
                 type: 'success',
                 text1: 'Thay đổi yêu cầu thành công',
