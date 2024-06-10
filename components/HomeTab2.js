@@ -23,7 +23,7 @@ const HomeTab2 = () => {
         })}>
             <Tab.Screen name='home' component={OrderScreen}></Tab.Screen>
             {/* <Tab.Screen name='Table' component={(props) => <TableScreen {...props} name="oke"/>}></Tab.Screen> */}
-            <Tab.Screen name='Table' component={TableScreen}></Tab.Screen>
+            <Tab.Screen name='table' component={TableScreen}></Tab.Screen>
 
             <Tab.Screen name='product' component={ProductScreen}></Tab.Screen>    
         </Tab.Navigator>

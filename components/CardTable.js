@@ -3,9 +3,11 @@ import { View, Text, TouchableOpacity } from "react-native";
 import {useNavigation} from "@react-navigation/native"
 import {useDispatch, useSelector} from "react-redux"
 import actions from "../redux/order/actions";
-const CardTable = ({item}) => {
+
+const CardTable = ({item, setIsVisibleConfirmChangeTable, setTableSelect}) => {
     const navigation = useNavigation()
     const dispatch = useDispatch()
+    const selectedOrder = useSelector((state) => state.order.selectedOrder)
 
     let active = false
 
@@ -14,10 +16,17 @@ const CardTable = ({item}) => {
     }
 
     const handleClickCardTable = () => {
-        dispatch(actions.action.selectedOrder({
-            id_tables: [item.id]
-        }))
-        navigation.navigate("Product", item)
+       if (!active) {
+        if (selectedOrder?.id) {
+            setIsVisibleConfirmChangeTable(true)
+            setTableSelect(item)
+         } else {
+          dispatch(actions.action.selectedOrder({
+              id_tables: [item.id]
+          }))
+          navigation.navigate("Product", item)
+         }
+       }
     }
     return (
        <TouchableOpacity

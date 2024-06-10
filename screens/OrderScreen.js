@@ -24,6 +24,7 @@ import {useFocusEffect} from "@react-navigation/native"
 import { useContext } from "react";
 import { AppContext } from "../context/appContext";
 import notifyMessage from "../components/notifyMessage";
+import Toast from "react-native-toast-message";
 const OrderScreen = () => {
  
   const navigation = useNavigation()
@@ -31,7 +32,13 @@ const OrderScreen = () => {
   
   socket.off("announce_success").on("announce_success", function (data) {
     if(data?.message === "success") {
-       notifyMessage(`Yêu cầu mã #${data?.id_invoice} hoàn thành`)
+      //  notifyMessage(`Yêu cầu mã #${data?.id_invoice} hoàn thành`)
+      console.log(data)
+      Toast.show({
+        type: 'success',
+        text1: "Thông báo",
+        text2:`Yêu cầu mã #${data?.id_invoice} hoàn thành`
+      });
     } else {
        
     }

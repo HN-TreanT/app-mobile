@@ -32,6 +32,10 @@ import { convertPrice } from "../utils/helpers/convertPrice";
 import { orderService } from "../utils/services/invoiceServices";
 import { useContext } from "react";
 import { AppContext } from "../context/appContext";
+import AsyncAlert from "../components/Alert";
+import Toast from "react-native-toast-message";
+import { Dialog } from "@rneui/themed";
+import { tableSerivces } from "../utils/services/tableServices";
 const DetailOrderScreen = (props) => {
     const {socket} = useContext(AppContext)
     const selectedOrder = useSelector((state) => state.order.selectedOrder)
@@ -40,9 +44,105 @@ const DetailOrderScreen = (props) => {
     const navigation = useNavigation()
     const id_table = props.route.params
     const [activeCategory, setActiveCategory] = useState(1)
-    const [visible, setIsVisible] = useState(false)
-
     const [data, setData] = useState(selectedOrder?.lst_invoice_detail || []);
+    const [visible, setIsVisible] = useState(false)
+    const [visbleDialogCancleOrder, setVisibleDialogCancleOrder] = useState(false)
+    const [visiblePayments, setVisiblePayments] = useState(false)
+
+    const [visibleChangeTable, setVisibleChangeTable] = useState(false)
+    
+    
+    const handleVisibleChangeTable = () => {
+      setVisibleChangeTable(!visibleChangeTable)
+    }
+
+    const handleVisibleDialogCancleOrder = () => {
+      setVisibleDialogCancleOrder(!visbleDialogCancleOrder)
+    }
+
+    const handleVisiblePaymentsOrder = () => {
+      setVisiblePayments(!visiblePayments)
+    }
+
+    const handleDeleteOrder = () => {
+     
+      if (selectedOrder?.id) {
+        const mapIdTables = Array.isArray(selectedOrder?.tablefood_invoices)
+        ? selectedOrder?.tablefood_invoices.map((item) => {
+            return item?.id_table;
+          })
+        : [];
+        orderService.update(selectedOrder?.id, {status: 2}).then(async (res) => {
+          if (res.status) {
+            tableSerivces.update(mapIdTables[0], {status: 0}).then(res => {
+
+            }).catch(err => {
+              console.log(err)
+            })
+          }
+
+          setIsVisible(false)
+          setVisibleDialogCancleOrder(false)
+          navigation.navigate("home")
+          dispatch(actions.action.selectedOrder({
+            lst_invoice_detail: [],
+            id_tables: []
+          }))
+          Toast.show({
+            type: 'success',
+            text1: 'Hủy đơn thành công',
+          });
+        
+        }).catch(err => {
+          console.log(err)
+          Toast.show({
+            type: 'error',
+            text1: 'Hủy đơn thất bại',
+          });
+
+        })
+
+
+
+      } else {
+        navigation.goBack()
+      }
+    }
+
+    const handlePayment = () => {
+      const mapIdTables = Array.isArray(selectedOrder?.tablefood_invoices)
+      ? selectedOrder?.tablefood_invoices.map((item) => {
+          return item?.id_table;
+        })
+      : [];
+      const price = selectedOrder?.lst_invoice_detail.reduce((sum, item) => sum + item.price, 0);
+      orderService.payments(selectedOrder?.id, price).then((res) => {
+        if (res?.status) {
+          tableSerivces.update(mapIdTables[0], {status: 0}).then(res => {
+
+          }).catch(err => {
+            console.log(err)
+          })
+          Toast.show({
+            type: 'success',
+            text1: 'Thanh toán thành công',
+          });
+          setVisiblePayments(false)
+          navigation.navigate("home")
+        }
+      }).catch(err => {
+        console.log(err)
+        Toast.show({
+          type: 'error',
+          text1: 'Thanh toán thất bại',
+        });
+
+      })
+      
+    }
+
+
+  
   
 
   const list = [
@@ -59,39 +159,42 @@ const DetailOrderScreen = (props) => {
     { 
       title: 'Hủy đơn', 
       icon: <DocumentMinusIcon size={25} color={"#0080ff"} style={{marginRight:4}}/>, 
-      onPress: () => console.log("huy don") 
+      onPress: () => setVisibleDialogCancleOrder(true)
     },
     { 
       title: 'Chuyển bàn', 
       icon: <ClipboardDocumentCheckIcon size={25} color={"#0080ff"} style={{marginRight:4}}/>, 
-      onPress: () => console.log(" chuyen ban") 
+      onPress: () => {
+        navigation.navigate("Table")
+        setIsVisible(false)
+      }
     },
   ];
 
-    const handleSave = () => {
-      if(selectedOrder?.id) {
-        console.log(selectedOrder)
-        const lst_invoice_detail = selectedOrder?.invoice_details.map((item) => {
-          return {
-           id_invoice: selectedOrder?.id,
-           id_product: !item?.isCombo ? item?.id_product : null,
-           id_combo: item?.isCombo ? item?.id_product : null,
-           isCombo: item?.isCombo,
-           price: item?.price,
-           amount: item?.amount
-          }
-         })
-         
+    const handleSave = async () => {
+      if(selectedOrder?.id) {         
          const dataSubmit = {
            id_employee: selectedOrder?.id_employee ? selectedOrder?.id_employee : null,
            id_customer: selectedOrder?.id_customer ? selectedOrder?.id_customer : null,
            id_promotion: selectedOrder?.id_promotion ? selectedOrder?.id_promotion : null,
-           lst_invoice_detail: lst_invoice_detail
+           lst_invoice_detail: selectedOrder?.lst_invoice_detail
     
          }
+         orderService.update(selectedOrder?.id, dataSubmit).then((res) => {
+            if (res.status) {
+              Toast.show({
+                type: 'success',
+                text1: 'Thay đổi yêu cầu thành công',
+              });
 
-         console.log(dataSubmit)
-
+            }
+         }).catch(err => {
+            console.log(err)
+            Toast.show({
+              type: 'error',
+              text1: 'Thay đổi yêu cầu thất bại',
+            });
+         })
       } else {
 
         const dataSubmit = {
@@ -126,7 +229,50 @@ const DetailOrderScreen = (props) => {
 
     return (
       <View style={{backgroundColor:"#F1F1F1"}} className="flex-1  relative box-border">
-           
+
+        <Dialog isVisible={visbleDialogCancleOrder} onBackdropPress={handleVisibleDialogCancleOrder}
+        >
+
+          <Text>Xác nhận hủy đơn</Text>
+          <Dialog.Actions>
+            <Dialog.Button
+              title="Xác nhận"
+              onPress={() => handleDeleteOrder()}
+            />
+            <Dialog.Button title="Hủy" onPress={handleVisibleDialogCancleOrder} />
+          </Dialog.Actions>
+            
+        </Dialog>
+
+        <Dialog isVisible={visiblePayments} onBackdropPress={handleVisiblePaymentsOrder}
+        >
+
+          <Text>Xác nhận thanh toán</Text>
+          <Dialog.Actions>
+            <Dialog.Button
+              title="Xác nhận"
+              onPress={() => handlePayment()}
+            />
+            <Dialog.Button title="Hủy" onPress={handleVisiblePaymentsOrder} />
+          </Dialog.Actions>
+            
+        </Dialog>
+
+        <Dialog isVisible={visibleChangeTable} onBackdropPress={handleVisibleChangeTable}
+        >
+
+          <Dialog.Title title="Chuyển bàn"/>
+
+          <Dialog.Actions>
+            <Dialog.Button
+              title="Xác nhận"
+              onPress={() => console.log("xacxs nhan")}
+            />
+            <Dialog.Button title="Hủy" onPress={handleVisibleChangeTable} />
+          </Dialog.Actions>
+            
+        </Dialog>
+      
         <SafeAreaView className="flex-1">
           <View
             style={{
@@ -135,7 +281,17 @@ const DetailOrderScreen = (props) => {
             }}
             className="px-4 pb-4 pt-2 flex-row justify-between items-center"
           >
-            <TouchableOpacity className=" rounded-full" onPress={() => navigation.goBack()}>
+            <TouchableOpacity className=" rounded-full" onPress={() => {
+              if (selectedOrder?.id) {
+                navigation.goBack()
+                dispatch(actions.action.selectedOrder({
+                  lst_invoice_detail: [],
+                  id_tables: []
+                }))
+              } else {
+                navigation.goBack()
+              }
+            }}>
               <ArrowLeftIcon size="27" color="rgb(179, 179, 179)" />
             </TouchableOpacity>
   
@@ -212,9 +368,8 @@ const DetailOrderScreen = (props) => {
                 </TouchableOpacity>
 
                
-                <TouchableOpacity  style={{backgroundColor:  "#24A019" , borderRadius:10, marginRight:15}}  className="w-1/3 m-2 flex-row items-center justify-center">
-                      <Text style={{color: "white"}} className="font-semibold p-2">Thanh toán</Text>
-                   
+                <TouchableOpacity disabled={selectedOrder?.id ? false : true} onPress={() => setVisiblePayments(true)}  style={{backgroundColor:  "#24A019" , borderRadius:10, marginRight:15, opacity: selectedOrder?.id ? 1 : 0.6}}  className="w-1/3 m-2 flex-row items-center justify-center">
+                      <Text style={{color: "white"}} className="font-semibold p-2">Thanh toán</Text>                 
                 </TouchableOpacity>
 
 
@@ -241,7 +396,7 @@ const DetailOrderScreen = (props) => {
                         </ListItem.Content>
                       </ListItem>
                     ))}
-                      <ListItem style={{borderTopColor: "#e6e6e6", borderTopWidth: 1}}>
+                      <ListItem  onPress={() => setIsVisible(false)} style={{borderTopColor: "#e6e6e6", borderTopWidth: 1}}>
                           <ListItem.Content className="flex-row justify-start items-center" >
                             <XMarkIcon size={25} color={"#0080ff"} style={{marginRight:4}}/>
                             <ListItem.Title >Đóng</ListItem.Title>

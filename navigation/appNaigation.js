@@ -10,7 +10,7 @@ import HomeTab from "../components/HomeTab";
 import HomeTab2 from "../components/HomeTab2";
 import LoginScreen from "../screens/LoginScreen";
 import TableScreen from "../screens/TableScreen";
-
+import Toast from "react-native-toast-message";
 export default function AppNavigation() {
     return (
         <NavigationContainer>
@@ -23,6 +23,7 @@ export default function AppNavigation() {
                 <Stack.Screen name="Table" options={{headerShown:false}} component={TableScreen}></Stack.Screen>
 
             </Stack.Navigator>
+            <Toast/>
         </NavigationContainer>
     )
 }

@@ -4,22 +4,17 @@ const api = createApiServices()
 
 const listAll = async (params) => {
     return api.makeAuthRequest({
-        url: `/api/v1/invoice-detail`,
+        url: `/api/v1/tablefood-invoice`,
         method: "GET",
         params: params
     
       });
 }
 
-// const detail = async (id) => {
-//     const uri = `/api/v1/invoice-detail/${id}`
-//     const res = await API.get(uri)
-//     return res
-// }
 
 const update = async (id,data) => {
     return api.makeAuthRequest({
-        url: `/api/v1/invoice-detail/${id}`,
+        url: `/api/v1/tablefood-invoice/${id}`,
         method: "PUT",
         data,
       });
@@ -27,7 +22,7 @@ const update = async (id,data) => {
 
 const create = async (data) => {
     return api.makeAuthRequest({
-        url: "/api/v1/invoice-detail",
+        url: "/api/v1/tablefood-invoice",
         method: "POST",
         data,
       });
@@ -36,11 +31,11 @@ const create = async (data) => {
 
 const deleteinvoiceDetail = async (id) => {
     return api.makeAuthRequest({
-        url: `/api/v1/invoice-detail/${id}`,
+        url: `/api/v1/tablefood-invoice/${id}`,
         method: "DELETE",
       });
 }
 
-export const invioceDetailServices = {
+export const tableInvoiceService = {
     listAll, deleteinvoiceDetail, update, create
 }
