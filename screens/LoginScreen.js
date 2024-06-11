@@ -55,7 +55,7 @@ const LoginScreen = () => {
     return (
         <View className="flex-1 relative bg-white box-border">
             
-             <Image source={require("../assets/beansBackground1.png")}
+             <Image source={require("../assets/assets_beansBackground1.png")}
              className="w-full h-full absolute -top-5 opacity-10"/> 
             {/* {/* <Text>Hoang Nam</Text> */}
             <SafeAreaView className="flex-1">

@@ -55,7 +55,7 @@ const CardDetailProductAddOrder = ({data, invoiceDetails, setInvoiceDetails}) =>
     }} className="w-full mt-2 mb-1 h-20 flex-row items-center">
         {
             data?.image ?  <Image className="h-20 w-20 ml-2" style={{borderRadius:10}} source={{uri: data?.image}}/> :
-            <Image className="h-20 w-20 ml-2" style={{borderRadius:10}} source={require("../assets/avatar.png")}/>
+            <Image className="h-20 w-20 ml-2" style={{borderRadius:10}} source={require("../assets/assets_avatar.png")}/>
         }
 
         <View className="ml-3 flex-col ">
