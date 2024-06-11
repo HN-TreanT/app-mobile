@@ -10,7 +10,7 @@ import {useDispatch, useSelector} from "react-redux"
 import { Input } from '@rneui/themed';
 import {UserIcon, LockClosedIcon} from "react-native-heroicons/solid"
 import {AppContext} from "../context/appContext"
-
+import Toast from "react-native-toast-message";
 const LoginScreen = () => {
     const {socket} = useContext(AppContext)
     const navigation = useNavigation()
@@ -44,10 +44,19 @@ const LoginScreen = () => {
             navigation.navigate("Home")
         }).catch(err => {
             console.log(err)
+            Toast.show({
+                type: 'success',
+                text1: err,
+                text1: err?.message,
+              });
             setErrorMessagePassword("Đăng nhập thất bại")
         })
        } else {
-        console.log("dien thong tin day du")
+          Toast.show({
+            type: 'success',
+            text1: 'Điền đầy đủ thông tin',
+          });
+         console.log("dien thong tin day du")
          setErrorMessagePassword("Đăng nhập thất bại")
        }
 
@@ -55,7 +64,9 @@ const LoginScreen = () => {
     return (
         <View className="flex-1 relative bg-white box-border">
             
-             <Image source={require("../assets/assets_beansBackground1.png")}
+             <Image 
+             source={null}
+            //  source={require("../assets/assets_beansBackground1.png")}
              className="w-full h-full absolute -top-5 opacity-10"/> 
             {/* {/* <Text>Hoang Nam</Text> */}
             <SafeAreaView className="flex-1">

@@ -44,12 +44,14 @@ const HomeScreen = () => {
     return (
         <View className="flex-1 relative bg-white box-border">
             
-             <Image source={require("../assets/assets_beansBackground1.png")}
+             <Image 
+             source={null}
+            //  source={require("../assets/assets_beansBackground1.png")}
              className="w-full absolute -top-5 opacity-10" style = {{height: 220}}/>
-            {/* <Text>Hoang Nam</Text> */}
+            {/* <Text >Hoang Nam</Text> */}
             <SafeAreaView className="flex-1">
                 <View className="px-4 pt-2 flex-row justify-between items-center">
-                    <Image source={require("../assets/assets_avatar.png")} className="h-9 w-9 rounded-full"/>
+                    {/* <Image source={require("../assets/assets_avatar.png")} className="h-9 w-9 rounded-full"/> */}
                    
                     <View className="flex-row items-center space-x-2">
                         <MapPinIcon size="25" color={themeColors.bgLight} />

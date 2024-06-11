@@ -53,11 +53,11 @@ const CardDetailProductAddOrder = ({data, invoiceDetails, setInvoiceDetails}) =>
         borderRadius:10,
        
     }} className="w-full mt-2 mb-1 h-20 flex-row items-center">
-        {
+        {/* {
             data?.image ?  <Image className="h-20 w-20 ml-2" style={{borderRadius:10}} source={{uri: data?.image}}/> :
             <Image className="h-20 w-20 ml-2" style={{borderRadius:10}} source={require("../assets/assets_avatar.png")}/>
-        }
-
+        } */}
+        <Image className="h-20 w-20 ml-2" style={{borderRadius:10}} source={{uri: data?.image}}/> 
         <View className="ml-3 flex-col ">
             <View><Text className="font-semibold" style={{fontSize:18}}>{data.name || " "}</Text></View>
             <View className="flex-row w-56 items-center mt-4 justify-between">
