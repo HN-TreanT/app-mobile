@@ -15,6 +15,7 @@ const CardOrder = ({item}) => {
   const navigation = useNavigation()
   const [hiddenDropdown, setHiddenDropdown] = useState(true)
   const createdAt = new Date(item.createdAt);
+  createdAt.setHours(createdAt.getHours() + 7);
   const now = new Date();
   let time = now.getTime() - createdAt.getTime();
   let timeOrders;

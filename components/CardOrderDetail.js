@@ -55,7 +55,7 @@ const CardOrderDetail = ({item, data, setData}) => {
             item?.image ?  <Image className="h-16 w-16 ml-2" style={{borderRadius:10}} source={{uri: item?.image}}/> :
             <Image className="h-20 w-20 ml-2" style={{borderRadius:10}} source={require("../assets/assets_avatar.png")}/>
         } */}
-        <Image className="h-20 w-20 ml-2" style={{borderRadius:10}} source={{uri: data?.image}}/> 
+        <Image className="h-20 w-20 ml-2" style={{borderRadius:10}} source={{uri: item?.image}}/> 
 
         <View className="ml-3 flex-col ">
             <View><Text className="font-semibold" style={{fontSize:18}}>{item.name || " "}</Text></View>

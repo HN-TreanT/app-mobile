@@ -191,7 +191,7 @@ const ProductScreen = (props) => {
 
            {/* list order */}
           <View
-             style={{height:444}}// treen oppo laf 444, tren may ao laf 590
+             style={{height:584}}// treen oppo laf 444, tren may ao laf 590
              className=" w-full flex-row mt-4  justify-center "
           >    
                 <View className="h-full w-11/12 ">

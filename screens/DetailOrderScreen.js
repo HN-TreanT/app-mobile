@@ -39,6 +39,7 @@ import { tableSerivces } from "../utils/services/tableServices";
 const DetailOrderScreen = (props) => {
     const {socket} = useContext(AppContext)
     const selectedOrder = useSelector((state) => state.order.selectedOrder)
+    console.log(selectedOrder)
     const infoEmployee = useSelector((state) => state.auth.user_info)
     const dispatch = useDispatch() 
     const navigation = useNavigation()
@@ -371,13 +372,13 @@ const DetailOrderScreen = (props) => {
                      <MapPinIcon size="23" color="#0080ff" style={{marginLeft:8}} />
                      <Text className=" ml-2" style={{color:"#0080ff"}}>Ăn tại bàn</Text>
                 </View>
-                <View className="w-1/2 flex-row items-center"><Text className="ml-4">Bàn số {selectedOrder?.tablefood_invoices ? selectedOrder?.tablefood_invoices[0].id_table : ""}</Text></View>
+                <View className="w-1/2 flex-row items-center"><Text className="ml-4">Bàn số {selectedOrder?.tablefood_invoices ? selectedOrder?.tablefood_invoices[0].id_table : selectedOrder?.id_tables  ?  selectedOrder?.id_tables[0] : ""}</Text></View>
 
            </View>
 
            {/* list order */}
            <View
-             style={{height:487}} // doi voiw oppo , doi voi android studio 600
+             style={{height:600}} // doi voiw oppo , doi voi android studio 600
             className=" w-full flex-row mt-4  justify-center "
           >    
                 <View className="h-full w-11/12 ">

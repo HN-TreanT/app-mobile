@@ -202,9 +202,9 @@ import {
             <BellIcon size="27" color="rgb(179, 179, 179)" />
           </View>
           <View className="h-10 flex-row items-center mr-2 ml-2 justify-between">
-            <Text className="font-semibold opacity-70">Tổng số đơn: 764</Text>
+            <Text className="font-semibold opacity-70"></Text>
             <View className="flex-row items-center">
-              <Text className="font-semibold opacity-70">Bàn trống: 12/48</Text>
+              <Text className="font-semibold opacity-70">Bàn trống: {dataSource.filter((item) => item?.status === 0).length}/{dataSource.length}</Text>
             </View>
           </View>
   
